@@ -2,6 +2,7 @@ package com.ota.jimmychen.ota;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Looper;
 import android.support.v4.content.ContextCompat;
@@ -44,12 +45,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String ACTIVITY_TAG="MainActivity";
     private String ip_address = "";
     boolean isInitialized = false;
+    boolean active_before_restore = false;
+
     TextView info_tv;
-    Button set_ip, set_param;
+    Button set_ip, set_param, view_temp;
     EditText ipInput, man_param;
 
-    MediaType JSON = MediaType.parse("application/json;charset=utf-8");
-    volatile
+    Networking network = new Networking();
 
     Thread data_proc_thread = null;
     Thread task_post_thread = null;
@@ -59,91 +61,68 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
-    private void post_request(final String urlStr, final JSONObject json) {
-        OkHttpClient httpClient = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
-        try {
-            Request request = new Request.Builder()
-                    .url(urlStr + "/post_tasks")
-                    .post(requestBody)
-                    .build();
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    //Toast.makeText(MainActivity.this, "POST failed", Toast.LENGTH_SHORT);
-    //              showToast("POST Failed");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String repStr = response.body().string();
-                    if (repStr != null) {
-                        try {
-                            JSONObject repJSON = new JSONObject(repStr);
-                            int status = repJSON.getInt("status");
-                            if (status == 1) {
-                                //Toast.makeText(MainActivity.this, "Submit Successful(1)", Toast.LENGTH_SHORT).show()
-                                // showToast("successful.");
-                            } else if (status == -1) {
-                                //Toast.makeText(MainActivity.this, "Submit Failed(-1)", Toast.LENGTH_SHORT).show();
-                                // showToast("failed.");
-                            }
-                        } catch (JSONException e) { /*And what can I possibly say?*/ }
-                    }
-                }
-            });
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            //Toast.makeText(MainActivity.this, "Illegal Address.", Toast.LENGTH_SHORT).show();
-            // showToast("illegal address");
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (active_before_restore) {
+            data_proc(ip_address);
         }
     }
 
-    private String get_data(final String urlStr) {
-        HttpURLConnection conn = null;
-        InputStream is = null;
-        String resultData = "";
-        try {
-            URL url = new URL(urlStr + "/data_fetch");
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            if (conn.getResponseCode() == 200) {
-                is = conn.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader bufferReader = new BufferedReader(isr);
-                String inputLine = "";
-                while ((inputLine = bufferReader.readLine()) != null) {
-                    resultData += inputLine + "\n";
-                }
-                Log.i(MainActivity.ACTIVITY_TAG, "resultData: " + resultData);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (data_proc_thread != null) { data_proc_thread.interrupt(); active_before_restore = true; }
+        if (task_post_thread != null) { task_post_thread.interrupt(); active_before_restore = true; }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        info_tv = (TextView)findViewById(R.id.info_tv);
+        set_ip = (Button)findViewById(R.id.set_ip);
+        ipInput = (EditText)findViewById(R.id.ip_input);
+        set_param = (Button)findViewById(R.id.manual_set);
+        man_param = (EditText)findViewById(R.id.man_param);
+        view_temp = (Button)findViewById(R.id.view_temp);
+
+        info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+        requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
+
+        set_ip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ip_address = "http://" + ipInput.getText().toString();
+                data_proc(ip_address);
+                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return resultData;
-    }
+        });
 
-    public static boolean hasPermission(Context context) {
-        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
-
-    public List<String> json_to_array(JSONArray jArray) {
-        List<String> list = new ArrayList<String>();
-        if (jArray != null) {
-            for (int i = 0; i < jArray.length(); i++) {
-                try { list.add(jArray.getString(i)); } catch (JSONException e) { e.printStackTrace(); }
+        set_param.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ip_address == null) { Toast.makeText(MainActivity.this, "Not Connected.", Toast.LENGTH_SHORT).show(); }
+                else {
+                    String pref = man_param.getText().toString();
+                    predict_alter(ip_address, pref);
+                    Toast.makeText(MainActivity.this, "Request Made.", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
-        return list;
-    }
+        });
 
-    public List<Double> str_to_double(List<String> strA) {
-        List<Double> res = new ArrayList<>();
-        for (int i = 0 ; i < strA.size(); i ++) {
-            try { res.add(Double.parseDouble(strA.get(i))); } catch (Exception e) { e.printStackTrace(); res.add(new Double(-1)); }
-        }
-        return res;
+        // TODO: 2019/2/3  Add precautions for ip_address unavailable problem
+
+        view_temp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, ViewTempActivity.class);
+                intent.putExtra("ip_address", ip_address);
+                startActivity(intent);
+            }
+        });
     }
 
     public void predict_alter(final String ip_address, final String pref) {
@@ -160,18 +139,18 @@ public class MainActivity extends AppCompatActivity {
                 task_post_thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JSONObject json = new JSONObject();
+                        JSONObject req = new JSONObject();
                         double exp_time = Double.parseDouble(pref.substring(0, pref.indexOf(":")));
                         double exp_temp = Double.parseDouble(pref.substring(pref.indexOf(":") + 1, pref.length()));
                         try {
-                            json.put("cmd", "modify_exp");
-                            json.put("exp_time", exp_time);
-                            json.put("exp_temp", exp_temp);
+                            req.put("cmd", "modify_exp");
+                            req.put("exp_time", exp_time);
+                            req.put("exp_temp", exp_temp);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        post_request(ip_address, json);
-                        String res = get_data(ip_address);
+                        network.post_request(ip_address, req);
+                        String res = network.get_data(ip_address);
                         try {
                             JSONObject json_res = new JSONObject(res);
                             int status = json_res.getInt("status");
@@ -188,13 +167,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject req = new JSONObject();
             req.put("cmd", "check_init_state");
-            post_request(ip_address, req);
-            JSONObject response = new JSONObject(get_data(ip_address));
+            network.post_request(ip_address, req);
+            JSONObject response = new JSONObject(network.get_data(ip_address));
             if (response.getInt("status") == -1) { Log.e(MainActivity.ACTIVITY_TAG, "update_init_state failed to fetch state."); }
             else {
-                 int init_state_int = response.getInt("init_state");
-                 if (init_state_int > 0) { isInitialized = true; }
-                 else isInitialized = false;
+                int init_state_int = response.getInt("init_state");
+                if (init_state_int > 0) { isInitialized = true; }
+                else isInitialized = false;
             }
         } catch (JSONException e) { e.printStackTrace(); }
 
@@ -235,14 +214,14 @@ public class MainActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    post_request(ip_address, json);
-                    String res = get_data(ip_address);
+                    network.post_request(ip_address, json);
+                    String res = network.get_data(ip_address);
                     try {
                         JSONObject json_rep = new JSONObject(res);
                         int status = json_rep.getInt("status");
                         if (status == 1) {
-                            List<String> temp = json_to_array(json_rep.getJSONArray("temp"));
-                            List<String> exp = json_to_array(json_rep.getJSONArray("exp"));
+                            List<String> temp = network.json_to_array(json_rep.getJSONArray("temp"));
+                            List<String> exp = network.json_to_array(json_rep.getJSONArray("exp"));
                             int time = json_rep.getInt("time");
                             int p_time = json_rep.getInt("p_time");
                             output = "";
@@ -263,38 +242,9 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "Thread started.", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        info_tv = (TextView)findViewById(R.id.info_tv);
-        set_ip = (Button)findViewById(R.id.set_ip);
-        ipInput = (EditText)findViewById(R.id.ipInput);
-        set_param = (Button)findViewById(R.id.manual_set);
-        man_param = (EditText)findViewById(R.id.man_param);
-
-        info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
-        requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
-        set_ip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ip_address = "http://" + ipInput.getText().toString();
-                data_proc(ip_address);
-                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
-            }
-        });
-        set_param.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ip_address == null) { Toast.makeText(MainActivity.this, "Not Connected.", Toast.LENGTH_SHORT).show(); }
-                else {
-                    String pref = man_param.getText().toString();
-                    predict_alter(ip_address, pref);
-                    Toast.makeText(MainActivity.this, "Request Made.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+    public static boolean hasPermission(Context context) {
+        int result = ContextCompat.checkSelfPermission(context, Manifest.permission.INTERNET);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
