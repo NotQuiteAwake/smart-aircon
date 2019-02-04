@@ -18,3 +18,4 @@ Many functions are yet complete, but any advise would be welcomed.
 - [ ] Raspberry Pi migration for the data collection code
 - [ ] Code rearrangement (OOP Optimization)
 - [ ] Bug Fixes
+- [ ] Build a local server demo without the arduino function

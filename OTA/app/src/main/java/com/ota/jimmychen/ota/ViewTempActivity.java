@@ -25,7 +25,7 @@ public class ViewTempActivity extends Activity {
 
     private Networking network = new Networking();
     private String ip_address = null;
-    private List<Double> temp_list = null;
+    private List<Double> temp_list = new ArrayList<>();
     private Thread get_temp_thread = null;
 
     @Override
@@ -54,13 +54,12 @@ public class ViewTempActivity extends Activity {
                     req.put("cmd", "data_req");
                 } catch (JSONException e) { e.printStackTrace(); /* Nujabes is the great producer */ }
                 network.post_request(ip_address, req);
-                List<String> temp = null;
+                List<String> temp = new ArrayList<>();
                 try {
                     JSONObject data = new JSONObject(network.get_data(ip_address));
                     temp = network.json_to_array(data.getJSONArray("temp"));
                 } catch (JSONException e) { e.printStackTrace(); }
-
-                temp_list = network.str_to_double(temp);
+                if (temp != null) temp_list = network.str_to_double(temp);
             }
         });
         get_temp_thread.run();
@@ -81,6 +80,7 @@ public class ViewTempActivity extends Activity {
     }
 
     private void initBarChart() {
+        if (temp_list.size() == 0) return;
         float barWidth = 0.45f;
         tempData.setBarWidth(barWidth);
         tempChart.setData(tempData);
