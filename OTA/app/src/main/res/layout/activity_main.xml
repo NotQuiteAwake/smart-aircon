@@ -14,51 +14,43 @@
         android:orientation="vertical"
         app:layout_constraintGuide_end="364dp" />
 
-    <EditText
-        android:id="@+id/ip_input"
-        android:layout_width="183dp"
-        android:layout_height="41dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="36dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/set_ip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/set"
-        app:layout_constraintBottom_toBottomOf="@+id/ip_input"
-        app:layout_constraintStart_toEndOf="@+id/ip_input"
-        app:layout_constraintTop_toTopOf="@+id/ip_input"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.843"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/info_tv"
         android:layout_width="328dp"
         android:layout_height="449dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="52dp"
         android:scrollbars="vertical"
         android:text="Log"
         app:layout_constraintEnd_toEndOf="@+id/set_ip"
-        app:layout_constraintHorizontal_bias="0.8"
-        app:layout_constraintStart_toStartOf="@+id/ip_input"
-        app:layout_constraintTop_toBottomOf="@+id/ip_input" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/set_ip" />
 
     <Button
         android:id="@+id/manual_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginBottom="84dp"
         android:text="ALTER"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/set_ip"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/set_ip" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/info_tv" />
 
     <EditText
         android:id="@+id/man_param"
@@ -82,5 +74,16 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/manual_set"
         app:layout_constraintTop_toBottomOf="@+id/manual_set" />
+
+    <Button
+        android:id="@+id/connect_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="96dp"
+        android:text="Connect"
+        app:layout_constraintBottom_toBottomOf="@+id/view_temp"
+        app:layout_constraintEnd_toStartOf="@+id/view_temp"
+        app:layout_constraintTop_toTopOf="@+id/view_temp"
+        app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>

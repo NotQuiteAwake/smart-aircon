@@ -1,10 +1,11 @@
 package com.ota.jimmychen.ota;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,30 +17,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.JarURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
     private static final String ACTIVITY_TAG="MainActivity";
@@ -48,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     boolean active_before_restore = false;
 
     TextView info_tv;
-    Button set_ip, set_param, view_temp;
-    EditText ipInput, man_param;
+    Button set_ip, set_param, view_temp, connect;
+    EditText man_param;
 
     Networking network = new Networking();
 
@@ -83,22 +64,41 @@ public class MainActivity extends AppCompatActivity {
 
         info_tv = (TextView)findViewById(R.id.info_tv);
         set_ip = (Button)findViewById(R.id.set_ip);
-        ipInput = (EditText)findViewById(R.id.ip_input);
         set_param = (Button)findViewById(R.id.manual_set);
         man_param = (EditText)findViewById(R.id.man_param);
         view_temp = (Button)findViewById(R.id.view_temp);
+        connect = (Button)findViewById(R.id.connect_button);
 
         info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
 
+        connect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("connect", ip_address);
+                data_proc(ip_address);
+            }
+        });
+
         set_ip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ip_address = "http://" + ipInput.getText().toString();
-                data_proc(ip_address);
-                Toast.makeText(MainActivity.this, "Connected", Toast.LENGTH_SHORT).show();
+                final EditText et = new EditText(MainActivity.this);
+                new AlertDialog.Builder(MainActivity.this).setTitle("Please Type in IP:")
+                        .setIcon(android.R.drawable.sym_def_app_icon)
+                        .setView(et)
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ip_address = "http://" + et.getText().toString();
+                            }
+                        })
+                        .setNegativeButton("Cancel", null).show();
+                // TODO: Find better methods for waiting. Candidate: jaredrummler/BlockingDialog
             }
         });
+
+
 
         set_param.setOnClickListener(new View.OnClickListener() {
             @Override
