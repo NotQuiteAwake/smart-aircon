@@ -15,7 +15,6 @@ import com.github.mikephil.charting.data.BarEntry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +37,14 @@ public class ViewTempActivity extends Activity {
         Intent intent = getIntent();
         ip_address = intent.getStringExtra("ip_address");
 
-        getTemp();
-        initData((ArrayList<Double>) temp_list);
-        initBarChart();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getTemp();
+                initData((ArrayList<Double>) temp_list);
+                initBarChart();
+            }
+        }).start();
     }
 
     // TODO: Put those methods into the Networking class to improve reusability.

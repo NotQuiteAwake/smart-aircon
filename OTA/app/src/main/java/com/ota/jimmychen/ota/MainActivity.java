@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
     boolean isInitialized = false;
     boolean active_before_restore = false;
 
-    TextView info_tv;
-    Button set_ip, set_param, view_temp, connect;
-    EditText man_param;
+    private TextView info_tv;
+    private Button set_ip, set_param, view_temp, connect, set_pref;
+    private EditText man_param;
 
     Networking network = new Networking();
 
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         man_param = (EditText)findViewById(R.id.man_param);
         view_temp = (Button)findViewById(R.id.view_temp);
         connect = (Button)findViewById(R.id.connect_button);
+        set_pref = (Button)findViewById(R.id.set_pref);
 
         info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
@@ -98,8 +99,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         set_param.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -119,6 +118,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, ViewTempActivity.class);
+                intent.putExtra("ip_address", ip_address);
+                startActivity(intent);
+            }
+        });
+
+        set_pref.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, EditExpActivity.class);
                 intent.putExtra("ip_address", ip_address);
                 startActivity(intent);
             }
