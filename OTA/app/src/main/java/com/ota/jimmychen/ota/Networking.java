@@ -26,6 +26,43 @@ import okhttp3.Response;
 public class Networking {
     MediaType JSON = MediaType.parse("application/json;charset=utf-8");
 
+    public final static boolean isJSONValid(String test) {
+        try {
+            com.alibaba.fastjson.JSONObject.parseObject(test);
+        } catch (com.alibaba.fastjson.JSONException ex) {
+            try {
+                com.alibaba.fastjson.JSONArray.parseObject(test);
+            } catch (com.alibaba.fastjson.JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean checkIP(String ip) {
+        HttpURLConnection conn = null;
+        InputStream is = null;
+        String resultData = "";
+        try {
+            URL url = new URL(ip + ":8080/");
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            if (conn.getResponseCode() == 200) {
+                is = conn.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader bufferReader = new BufferedReader(isr);
+                String inputLine = "";
+                while ((inputLine = bufferReader.readLine()) != null) {
+                    resultData += inputLine + "\n";
+                }
+                Log.i("get_data:", "resultData: " + resultData);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return isJSONValid(resultData);
+    }
+
     public void post_request(final String urlStr, final JSONObject json) {
         OkHttpClient httpClient = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
