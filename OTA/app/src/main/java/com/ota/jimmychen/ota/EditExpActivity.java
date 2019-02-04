@@ -99,12 +99,12 @@ public class EditExpActivity extends Activity {
         expChart.setData(expData);
         expChart.setScaleEnabled(true);
 
+        //XAxis Settings
         XAxis xAxis = expChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setLabelRotationAngle(10f);
-        xAxis.setAxisMinimum(0);
-
+        xAxis.setAxisMinimum(0f);
         YAxis RAxis = expChart.getAxisRight();
         RAxis.setEnabled(false);
 
@@ -113,7 +113,8 @@ public class EditExpActivity extends Activity {
         LAxis.setDrawAxisLine(false);
         LAxis.setDrawAxisLine(false);
         LAxis.setDrawGridLines(false);
-        LAxis.setAxisMinimum(0f);
+        LAxis.setAxisMinimum(10f);
+        LAxis.setAxisMaximum(30f);
         expChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
