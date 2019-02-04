@@ -4,7 +4,6 @@ import sys
 
 import logging
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
 
 manager = Manager()
 app = Flask(__name__)
@@ -36,12 +35,18 @@ def handle_task():
 	cmd = request.json['cmd']
 	if cmd == 'data_req' or cmd == 'check_init_state':
 		task = {'cmd': cmd}
-	elif cmd == 'modify_exp':
+	elif cmd == 'modify_exp_temp':
 		task = {
 			'cmd': request.json['cmd'],
 			'exp_time': request.json['exp_time'],
 			'exp_temp': request.json['exp_temp']
 		}
+	elif cmd == 'modify_exp_time':
+		task = {
+			'cmd': request.json['cmd'],
+			'exp_time': request.json['exp_time']
+		}
+
 	else:
 		return jsonify({'status': -1})
 	tasks.append(task)
@@ -61,10 +66,13 @@ def comp_task():
 			temp_list = [x for x in temp]
 			exp_list = [x for x in exp]
 			return jsonify({'status': 1, 'temp': temp_list, 'exp': exp_list, 'time': cur_stamp.value % 24, 'p_time': p_nxt_time.value})
-		elif task['cmd'] == 'modify_exp':
+		elif task['cmd'] == 'modify_exp_temp':
+			if mutex.acquire():
+				exp[task['exp_time']] = task['exp_temp']
+			mutex.release()
+		elif task['cmd'] == 'modify_exp_time':
 			if mutex.acquire():
 				nxt_time.value = task['exp_time']
-				exp[nxt_time.value] = task['exp_temp']
 			mutex.release()
 			return jsonify({'status': 1})
 		else:
@@ -72,6 +80,7 @@ def comp_task():
 
 
 def run(init_state_v, nxt_time_v, exp_arr, temp_arr, p_nxt_time_v, cur_stamp_v):
+	log.setLevel(logging.ERROR)
 	global exp, temp, nxt_time, init_state, p_nxt_time, cur_stamp
 	exp = exp_arr
 	temp = temp_arr

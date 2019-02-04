@@ -3,11 +3,12 @@ import time
 from pandas import read_csv
 import csv
 from lstm_class import keras_lstm
-from multiprocessing import Lock, Array, Value
+from multiprocessing import Lock, Value, Manager
+
+manager = Manager()
 
 ser = serial.Serial('/dev/cu.usbmodem14101', 115200, timeout = 1)
 mutex = Lock()
-
 
 act_LSTM = keras_lstm(_n_epochs=5000, _verbose=0)
 exp_LSTM = keras_lstm(_n_epochs=5000, _verbose=0)
@@ -57,7 +58,6 @@ def init():
 	time_LSTM.train(timedt)
 
 	if record_flag :
-#		samp_len = int(raw_input("Number of samples: "))
 		samp_len = 40
 		ser.write(str(samp_len) + "#")
 		
@@ -109,7 +109,6 @@ def loop():
 		cur = int(time.time())
 		relStamp.value = int(cur - stStamp)
 		timeDiff = int(cur - lstStamp)
-		#multi-threading update
 
 		mutex.acquire()
 		if nxt_time.value != 0:
@@ -170,9 +169,8 @@ def run(init_state_v, nxt_time_v, exp_arr, temp_arr, _record_flag, p_nxt_time_v,
 
 
 if __name__ == '__main__':
-	tempRec = Array('d', [])
-	expdt = Array('d', [])
+	tempRec = manager.list()
+	expdt = manager.list()
 	init_state = Value('i', 0)
 	nxt_time = Value('i', 0)
-	nxt_time = 0
 	run(init_state, nxt_time, expdt, tempRec)
