@@ -24,13 +24,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String ACTIVITY_TAG="MainActivity";
-    private String ip_address = "";
+    private String ip_address = "", pref = "";
     boolean isInitialized = false;
     boolean active_before_restore = false;
 
     private TextView info_tv;
     private Button set_ip, set_param, view_temp, connect, set_pref;
-    private EditText man_param;
 
     Networking network = new Networking();
 
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         info_tv = (TextView)findViewById(R.id.info_tv);
         set_ip = (Button)findViewById(R.id.set_ip);
         set_param = (Button)findViewById(R.id.manual_set);
-        man_param = (EditText)findViewById(R.id.man_param);
         view_temp = (Button)findViewById(R.id.view_temp);
         connect = (Button)findViewById(R.id.connect_button);
         set_pref = (Button)findViewById(R.id.set_pref);
@@ -85,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final EditText et = new EditText(MainActivity.this);
-                new AlertDialog.Builder(MainActivity.this).setTitle("Please Type in IP:")
+                new AlertDialog.Builder(MainActivity.this).setTitle("IP:")
                         .setIcon(android.R.drawable.sym_def_app_icon)
                         .setView(et)
                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -104,9 +102,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (ip_address == null) { Toast.makeText(MainActivity.this, "Not Connected.", Toast.LENGTH_SHORT).show(); }
                 else {
-                    String pref = man_param.getText().toString();
-                    predict_alter(ip_address, pref);
-                    Toast.makeText(MainActivity.this, "Request Made.", Toast.LENGTH_SHORT).show();
+                    final EditText et = new EditText(MainActivity.this);
+                    new AlertDialog.Builder(MainActivity.this).setTitle("Next Time")
+                            .setIcon(android.R.drawable.sym_def_app_icon)
+                            .setView(et)
+                            .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    pref = et.getText().toString();
+                                    predict_alter(ip_address, pref);
+                                    Log.i("set_param", "Request Made");
+                                }
+                            })
+                            .setNegativeButton("Cancel", null).show();
                 }
             }
         });
