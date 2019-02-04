@@ -1,15 +1,16 @@
 from flask import *
-from multiprocessing import Array, Value, Lock
+from multiprocessing import Value, Lock, Manager
 import sys
 
 import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
+manager = Manager()
 app = Flask(__name__)
 tasks = list()
-temp = Array('d', [])
-exp = Array('d', [i for i in range(24)])
+temp = manager.list()
+exp = manager.list()
 nxt_time = Value('i', 0)
 init_state = Value('i', 0)
 cur_stamp = Value('i', 0)
@@ -82,4 +83,10 @@ def run(init_state_v, nxt_time_v, exp_arr, temp_arr, p_nxt_time_v, cur_stamp_v):
 
 
 if __name__ == '__main__':
-	app.run(host='0.0.0.0', port=8080)
+	print("Running in DEMO mode.")
+	init_state.value = 1
+	for i in range(24):
+		temp.append(i)
+		exp.append(i)
+
+	app.run(host='127.0.0.1', port=8080)

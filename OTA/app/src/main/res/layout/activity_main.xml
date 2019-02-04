@@ -29,8 +29,8 @@
 
     <TextView
         android:id="@+id/info_tv"
-        android:layout_width="328dp"
-        android:layout_height="449dp"
+        android:layout_width="322dp"
+        android:layout_height="322dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="52dp"
         android:scrollbars="vertical"
@@ -85,5 +85,19 @@
         app:layout_constraintEnd_toStartOf="@+id/view_temp"
         app:layout_constraintTop_toTopOf="@+id/view_temp"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/set_pref"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="44dp"
+        android:text="Pref"
+        app:layout_constraintBottom_toTopOf="@+id/manual_set"
+        app:layout_constraintEnd_toEndOf="@+id/manual_set"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/manual_set"
+        app:layout_constraintTop_toBottomOf="@+id/info_tv"
+        app:layout_constraintVertical_bias="1.0" />
 
 </android.support.constraint.ConstraintLayout>
