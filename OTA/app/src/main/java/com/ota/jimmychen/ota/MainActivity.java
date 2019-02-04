@@ -149,12 +149,10 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         JSONObject req = new JSONObject();
-                        double exp_time = Double.parseDouble(pref.substring(0, pref.indexOf(":")));
-                        double exp_temp = Double.parseDouble(pref.substring(pref.indexOf(":") + 1, pref.length()));
+                        double exp_time = Double.parseDouble(pref);
                         try {
-                            req.put("cmd", "modify_exp");
+                            req.put("cmd", "modify_exp_time");
                             req.put("exp_time", exp_time);
-                            req.put("exp_temp", exp_temp);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

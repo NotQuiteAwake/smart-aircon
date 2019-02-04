@@ -79,7 +79,7 @@ public class ViewTempActivity extends Activity {
             yValues.add(new BarEntry(x, double_to_float(data.get(x))));
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Temperature Record");
-        barDataSet.setColor(Color.BLUE);
+        barDataSet.setColor(Color.BLACK);
         tempData = new BarData(barDataSet);
     }
 

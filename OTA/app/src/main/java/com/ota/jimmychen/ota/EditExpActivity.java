@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import org.json.JSONException;
@@ -29,6 +31,7 @@ import java.util.List;
 public class EditExpActivity extends Activity {
     private BarChart expChart = null;
     private BarData expData = null;
+    private ArrayList<BarEntry> yValues = new ArrayList<>();
 
     private Networking network = new Networking();
     private String ip_address = null;
@@ -81,12 +84,11 @@ public class EditExpActivity extends Activity {
     }
 
     private void initData(ArrayList<Double> data) {
-        ArrayList<BarEntry> yValues = new ArrayList<>();
         for (int x = 0; x < data.size(); x++) {
             yValues.add(new BarEntry(x, double_to_float(data.get(x))));
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Expected Temperature");
-        barDataSet.setColor(Color.BLUE);
+        barDataSet.setColor(Color.BLACK);
         expData = new BarData(barDataSet);
         float barWidth = 0.45f;
         expData.setBarWidth(barWidth);
@@ -116,7 +118,8 @@ public class EditExpActivity extends Activity {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 // TODO: index = -1; Results in an ArrayIndexOutOfBoundsException
-                final int index = h.getDataIndex();
+                final int index = (int)e.getX();
+                Log.i("expChart.OnChartValueSelected", "index = " + index);
                 final EditText et = new EditText(EditExpActivity.this);
                 et.setText(String.valueOf(exp_list.get(index)));
                 new AlertDialog.Builder(EditExpActivity.this)
@@ -126,9 +129,24 @@ public class EditExpActivity extends Activity {
                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                exp_list.set(index, Double.valueOf(et.getText().toString()));
-                                removeDataSet();
-                                updateDataSet();
+                                final double exp_temp = Double.valueOf(et.getText().toString());
+                                exp_list.set(index, exp_temp);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            JSONObject req = new JSONObject();
+                                            req.put("cmd", "modify_exp_temp");
+                                            req.put("exp_temp", exp_temp);
+                                            req.put("exp_time", index);
+                                            network.post_request(ip_address, req);
+                                            network.get_data(ip_address);
+                                        } catch (JSONException e) { e.printStackTrace(); }
+                                    }
+                                }).start();
+                                yValues.set(index, new BarEntry(index, double_to_float(exp_temp)));
+                                expChart.notifyDataSetChanged();
+                                expChart.invalidate();
                             }
                         })
                         .setNegativeButton("Cancel", null).show();
@@ -138,37 +156,4 @@ public class EditExpActivity extends Activity {
             public void onNothingSelected() { }
         });
     }
-
-    private void updateDataSet() {
-        initData((ArrayList<Double>) exp_list);
-        expChart.setData(expData);
-        expChart.setScaleEnabled(true);
-        expChart.notifyDataSetChanged();
-        expChart.invalidate();
-    }
-
-    private void removeDataSet() {
-        BarData barData = expChart.getBarData();
-        if (barData != null) {
-            while (barData.getDataSetCount() > 0) {
-                removeLastEntry();
-            }
-            expChart.notifyDataSetChanged();
-            expChart.invalidate();
-        }
-    }
-
-    private void removeLastEntry() {
-        BarData barData = expChart.getBarData();
-        if (barData != null) {
-            int index = barData.getDataSetCount() - 1;
-            BarDataSet lastDataSet = (BarDataSet) barData.getDataSetByIndex(index);
-            if (lastDataSet != null) {
-                Entry lastEntry = lastDataSet.getEntryForIndex(
-                        lastDataSet.getEntryCount() - 1);
-                barData.removeEntry(lastEntry, index);
-               }
-        }
-    }
-
 }
