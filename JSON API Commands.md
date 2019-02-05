@@ -1,4 +1,25 @@
-JSON API Commands
+# JSON API Commands
+### Introduction
+The file lists all the API commands that are available through JSON. 
+
+### What does it mean?
+~~Strikethrough~~ commands are not ready-to-go yet.
+
+*Italic* commands are implemented but not tested.
+
+```JAVA
+@return
+// provides the list of variables that are returned by the server.
+!not-taken-care-of
+*ready-to-use
+```
+
+```JAVA
+@param
+// provdes the list of parameters to be sent along with the command. 
+```
+
+### List of Commands
 - check_init_state
     
     ```JAVA
@@ -7,12 +28,12 @@ JSON API Commands
     *init_state
     ```
 
-- ~~data_req~~
+- *data_req*
 
     ```JAVA
     @return
     *status
-    *temp_list
+    *temp
     *exp // current enabled set of exp
     *time
     *p_time // predicted time
@@ -32,12 +53,11 @@ JSON API Commands
     *status
     ```
 
-- ~~modify_exp_time~~
+- *modify_exp_time*
 
     ```JAVA
     @param
     *exp_time
-    !person_id
     ```
 
     ```JAVA
@@ -45,15 +65,15 @@ JSON API Commands
     *status
     ```
 
-- ~~request_member_list~~
+- *request_member_list*
 
     ```JAVA
     @return
+    *status    
     *member_list
-    !status    
     ```
 
-- ~~request_exp~~
+- *request_exp*
 
     ```JAVA
     @param
@@ -62,6 +82,90 @@ JSON API Commands
 
     ```JAVA
     @return
-    !status
+    *status
     *exp
+    ```
+
+- *request_prime_user*
+
+    ```JAVA
+    @return
+    *status
+    *prime_user
+    ```
+
+- ~~set_user_presence~~
+
+    ```JAVA
+    @param
+    !person_id
+    !presense
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~set_user_priority~~
+    
+    ```JAVA
+    @param
+    !person_id
+    !priority
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~set_user_state~~
+    
+    ```JAVA
+    @param
+    !person_id
+    !state_id
+    ```
+    
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~add_state~~
+
+    ```JAVA
+    @param
+    !state_id
+    !temp_diff
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~remove_state~~
+
+    ```JAVA
+    @param
+    !state_id
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~set_state~~
+
+    ```JAVA
+    @param
+    !state_id
+    !temp_diff
+    ```
+
+    ```JAVA
+    !status
     ```
