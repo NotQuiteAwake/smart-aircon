@@ -10,8 +10,10 @@ import time
 import matplotlib
 matplotlib.use('TkAgg')
 
+
 def round_int(num) :
     return int(num + 0.5)
+
 
 class LossHistory(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
@@ -36,21 +38,23 @@ class LossHistory(keras.callbacks.Callback):
         iters = range(len(self.losses[loss_type]))
         plt.figure()
         # acc
-        #plt.plot(iters, self.accuracy[loss_type], 'r', label='train acc')
+        # plt.plot(iters, self.accuracy[loss_type], 'r', label='train acc')
         # loss
         plt.plot(iters, self.losses[loss_type], 'g', label='train loss')
-        #if loss_type == 'epoch':
+        # if loss_type == 'epoch':
             # val_acc
-            #plt.plot(iters, self.val_acc[loss_type], 'b', label='val acc')
+            # plt.plot(iters, self.val_acc[loss_type], 'b', label='val acc')
             # val_loss
-            #plt.plot(iters, self.val_loss[loss_type], 'k', label='val loss')
+            # plt.plot(iters, self.val_loss[loss_type], 'k', label='val loss')
         plt.grid(True)
         plt.xlabel(loss_type)
         plt.ylabel('train loss')
         plt.legend(loc="upper right")
         plt.show()
 
+
 history = LossHistory()
+
 
 class keras_lstm:
     n_steps = 3
@@ -85,7 +89,7 @@ class keras_lstm:
             y.append(seq_y)
         return array(X), array(y)
 
-    #transform time sequence into time difference sequence
+    # transform time sequence into time difference sequence
     def time_transform(self, time_sequence) :
         diff_sequence = []
         for i in xrange(1, len(time_sequence)):
