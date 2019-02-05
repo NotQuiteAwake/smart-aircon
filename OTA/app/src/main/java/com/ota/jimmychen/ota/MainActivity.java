@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean active_before_restore = false;
 
     private TextView info_tv;
-    private Button set_ip, set_param, view_temp, connect, set_pref;
+    private Button set_ip, set_param, view_temp, connect, set_pref, set_prio;
 
     private Networking network = new Networking(PORT_NUMBER);
 
@@ -68,9 +68,20 @@ public class MainActivity extends AppCompatActivity {
         view_temp = (Button)findViewById(R.id.view_temp);
         connect = (Button)findViewById(R.id.connect_button);
         set_pref = (Button)findViewById(R.id.set_pref);
+        set_prio = (Button)findViewById(R.id.set_prio);
 
         info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
+
+        set_prio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, SetPriorityActivity.class);
+                intent.putExtra("ip_address", ip_address);
+                startActivity(intent);
+            }
+        });
 
         connect.setOnClickListener(new View.OnClickListener() {
             @Override

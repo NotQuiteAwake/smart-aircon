@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:id="@+id/item_tx"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="10dp"
+    android:layout_gravity="center_horizontal"
+    android:text="Item"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+</TextView>
