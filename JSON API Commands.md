@@ -10,7 +10,7 @@ The file lists all the API commands that are available through JSON.
 ```JAVA
 @return
 // provides the list of variables that are returned by the server.
-!not-taken-care-of
+!not-yet-implemented
 *ready-to-use
 ```
 
@@ -34,7 +34,8 @@ The file lists all the API commands that are available through JSON.
     @return
     *status
     *temp
-    *exp // current enabled set of exp
+    *exp
+    !exp_temp // current enabled set of exp
     *time
     *p_time // predicted time
     ```
@@ -73,7 +74,7 @@ The file lists all the API commands that are available through JSON.
     *member_list
     ```
 
-- *request_exp*
+- *!request_exp_temp*
 
     ```JAVA
     @param
@@ -84,6 +85,7 @@ The file lists all the API commands that are available through JSON.
     @return
     *status
     *exp
+    !exp_temp
     ```
 
 - *request_prime_user*
@@ -168,4 +170,56 @@ The file lists all the API commands that are available through JSON.
 
     ```JAVA
     !status
+    ```
+
+- ~~add_user~~
+
+    ```JAVA
+    @param
+    !person_id
+    !priority
+    !exp_temp
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~remove_user~~
+
+    ```JAVA
+    @param
+    !person_id
+    ```
+
+    ```JAVA
+    @return
+    !status
+    ```
+
+- ~~get_user_state~~
+
+    ```JAVA
+    @param
+    !person_id
+    ```
+
+    ```JAVA
+    @return
+    !status
+    !state
+    ```
+
+- ~~get_user_priority~~
+
+    ```JAVA
+    @param
+    !person_id
+    ```
+
+    ```JAVA
+    @return
+    !status
+    !priority
     ```
