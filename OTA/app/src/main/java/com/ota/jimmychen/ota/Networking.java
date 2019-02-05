@@ -25,7 +25,7 @@ import okhttp3.Response;
 
 public class Networking {
     MediaType JSON = MediaType.parse("application/json;charset=utf-8");
-
+    private static int PORT_NUMBER = 8080;
     /*
     public final static boolean isJSONValid(String test) {
         try {
@@ -41,12 +41,14 @@ public class Networking {
     }
 */
 
+    Networking(int port_number) { PORT_NUMBER = port_number; }
+
     public boolean checkIP(String ip) {
         HttpURLConnection conn = null;
         InputStream is = null;
         String resultData = "";
         try {
-            URL url = new URL(ip + ":8080/");
+            URL url = new URL(ip + ":" + PORT_NUMBER);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             if (conn.getResponseCode() == 200) {
@@ -69,9 +71,10 @@ public class Networking {
         return false;
     }
 
-    public void post_request(final String urlStr, final JSONObject json) {
+    public void post_request(final String urlstr, final JSONObject json) {
         OkHttpClient httpClient = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
+        final String urlStr = urlstr + ":" + PORT_NUMBER;
         try {
             Request request = new Request.Builder()
                     .url(urlStr + "/post_tasks")
@@ -109,10 +112,11 @@ public class Networking {
         }
     }
 
-    public String get_data(final String urlStr) {
+    public String get_data(final String urlstr) {
         HttpURLConnection conn = null;
         InputStream is = null;
         String resultData = "";
+        final String urlStr = urlstr + ":" + PORT_NUMBER;
         try {
             URL url = new URL(urlStr + "/data_fetch");
             conn = (HttpURLConnection) url.openConnection();

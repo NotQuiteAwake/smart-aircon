@@ -29,11 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EditExpActivity extends Activity {
+    private static final int PORT_NUMBER = 8080;
     private BarChart expChart = null;
     private BarData expData = null;
     private ArrayList<BarEntry> yValues = new ArrayList<>();
 
-    private Networking network = new Networking();
+    private Networking network = new Networking(PORT_NUMBER);
     private String ip_address = null;
     private List<Double> exp_list = new ArrayList<>();
     private Thread get_exp_thread = null;
@@ -115,6 +116,12 @@ public class EditExpActivity extends Activity {
         LAxis.setDrawGridLines(false);
         LAxis.setAxisMinimum(10f);
         LAxis.setAxisMaximum(30f);
+
+        expChart.setScaleEnabled(false);
+        expChart.setScaleXEnabled(true);
+        expChart.setScaleYEnabled(false);
+        expChart.setDoubleTapToZoomEnabled(false);
+
         expChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {

@@ -23,18 +23,19 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String ACTIVITY_TAG="MainActivity";
+    private static final String ACTIVITY_TAG=MainActivity.class.getSimpleName();
     private String ip_address = "", pref = "";
-    boolean isInitialized = false;
-    boolean active_before_restore = false;
+    private static final int PORT_NUMBER = 8080;
+    private boolean isInitialized = false;
+    private boolean active_before_restore = false;
 
     private TextView info_tv;
     private Button set_ip, set_param, view_temp, connect, set_pref;
 
-    Networking network = new Networking();
+    private Networking network = new Networking(PORT_NUMBER);
 
-    Thread data_proc_thread = null;
-    Thread task_post_thread = null;
+    private Thread data_proc_thread = null;
+    private Thread task_post_thread = null;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 NetworkScanner scanner = new NetworkScanner();
                 scanner.scan();
                 String ip = scanner.getAcAddress();
-                if (ip != null) ip_address = ip + ":8080";
+                if (ip != null) ip_address = ip;
                 Log.i(ACTIVITY_TAG, "Scan complete. Address is " + ip_address);
             }
         }).start();
