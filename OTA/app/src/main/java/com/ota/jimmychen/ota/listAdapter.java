@@ -35,4 +35,15 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.listViewHolder
     public int getItemCount() {
         return mDataset.size();
     }
+
+    public void add(int position, String str) {
+        mDataset.add(position, str);
+        notifyItemInserted(position);
+    }
+
+    public void remove(int position) {
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+        notifyDataSetChanged();
+    }
 }
