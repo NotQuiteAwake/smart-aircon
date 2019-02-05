@@ -21,8 +21,9 @@ import java.util.List;
 public class ViewTempActivity extends Activity {
     private BarChart tempChart = null;
     private BarData tempData = null;
+    private final static int PORT_NUMBER = 8080;
 
-    private Networking network = new Networking();
+    private Networking network = new Networking(PORT_NUMBER);
     private String ip_address = null;
     private List<Double> temp_list = new ArrayList<>();
     private Thread get_temp_thread = null;
@@ -105,6 +106,11 @@ public class ViewTempActivity extends Activity {
         LAxis.setDrawAxisLine(false);
         LAxis.setDrawGridLines(false);
         LAxis.setAxisMinimum(0f);
+
+        tempChart.setScaleEnabled(false);
+        tempChart.setScaleXEnabled(true);
+        tempChart.setScaleYEnabled(false);
+        tempChart.setDoubleTapToZoomEnabled(false);
     }
 
 }

@@ -17,8 +17,9 @@ import java.util.concurrent.TimeUnit;
 
 public class NetworkScanner {
     private static final String ACTIVITY_TAG = NetworkScanner.class.getSimpleName();
+    private static final int PORT_NUMBER = 8080;
 
-    private Networking network = new Networking();
+    private Networking network = new Networking(PORT_NUMBER);
 
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAX_IMUM_POOL_SIZE = 255;
