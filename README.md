@@ -4,8 +4,6 @@
 
 NB: The project is created for competition purposes.
 
-Welcome to the dev branch of the project, where commits containing untested functions are made in advance.
-
 The aim of the project is to build a smart system for air conditioners using a laptop and an arduino device.
 
 Many functions are yet complete, but any advise would be welcomed.
