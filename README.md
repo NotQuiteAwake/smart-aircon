@@ -14,8 +14,9 @@ Many functions are yet complete, but any advise would be welcomed.
 
 - [x] Implementation of Temperature Visualisation
 - [x] Implementation of Dialogs for interaction
-- [ ] Implementation of auto-search for the server (in progress)
+- [x] Implementation of auto-search for the server (test incomplete)
 - [ ] Implementation of a Tag System to describe user status
 - [ ] Implementation of a Priority System for multiple users
 - [ ] Raspberry Pi migration for the data collection code
+- [ ] UI rearrangement
 - [ ] Code rearrangement (OOP Optimization)

@@ -118,7 +118,6 @@ public class EditExpActivity extends Activity {
         expChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                // TODO: index = -1; Results in an ArrayIndexOutOfBoundsException
                 final int index = (int)e.getX();
                 Log.i("expChart.OnChartValueSelected", "index = " + index);
                 final EditText et = new EditText(EditExpActivity.this);
