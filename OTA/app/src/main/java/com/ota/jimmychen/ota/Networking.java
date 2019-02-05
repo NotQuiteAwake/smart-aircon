@@ -26,6 +26,7 @@ import okhttp3.Response;
 public class Networking {
     MediaType JSON = MediaType.parse("application/json;charset=utf-8");
 
+    /*
     public final static boolean isJSONValid(String test) {
         try {
             com.alibaba.fastjson.JSONObject.parseObject(test);
@@ -38,6 +39,7 @@ public class Networking {
         }
         return true;
     }
+*/
 
     public boolean checkIP(String ip) {
         HttpURLConnection conn = null;
@@ -60,7 +62,11 @@ public class Networking {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return isJSONValid(resultData);
+        try {
+            JSONObject json = new JSONObject(resultData);
+            if (json.getString("description") == "smart-air-conditioner") return true;
+        } catch (JSONException e) { return false; }
+        return false;
     }
 
     public void post_request(final String urlStr, final JSONObject json) {

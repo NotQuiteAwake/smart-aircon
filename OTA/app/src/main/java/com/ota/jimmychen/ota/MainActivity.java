@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final EditText et = new EditText(MainActivity.this);
+                et.setText(ip_address);
                 new AlertDialog.Builder(MainActivity.this).setTitle("IP:")
                         .setIcon(android.R.drawable.sym_def_app_icon)
                         .setView(et)
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        scan();
     }
 
     public void predict_alter(final String ip_address, final String pref) {
@@ -192,6 +194,19 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (JSONException e) { e.printStackTrace(); }
 
+    }
+
+    public void scan() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                NetworkScanner scanner = new NetworkScanner();
+                scanner.scan();
+                String ip = scanner.getAcAddress();
+                if (ip != null) ip_address = ip + ":8080";
+                Log.i(ACTIVITY_TAG, "Scan complete. Address is " + ip_address);
+            }
+        }).start();
     }
 
     public void data_proc(final String ip_address) {

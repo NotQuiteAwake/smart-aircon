@@ -20,7 +20,7 @@ mutex = Lock()
 
 @app.route('/')
 def service_test():
-	return "<h1>This is a local server for server-app connectivity.<h1>\n"
+	return jsonify({'description': 'smart-air-conditioner'})
 
 
 @app.errorhandler(404)
