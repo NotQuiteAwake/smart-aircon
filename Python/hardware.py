@@ -93,8 +93,6 @@ def init():
 		init_state.value = 1
 	mutex.release()
 
-#	print("Init Complete")
-
 
 def loop():
 	global tempRec, timedt, expdt, lastt, lstStamp, p_nxt, turnedOn, turnedOff, stStamp, nxtDiff, nxt_time, p_nxt_time

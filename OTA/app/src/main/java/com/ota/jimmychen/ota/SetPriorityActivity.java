@@ -11,6 +11,8 @@ import java.util.List;
 
 public class SetPriorityActivity extends Activity {
     private static String ip_address;
+    private static final int PORT_NUMBER = 8080;
+    private Networking network = new Networking(PORT_NUMBER);
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
