@@ -19,11 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="348dp"
         android:layout_marginEnd="8dp"
         android:text="@string/set"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.843"
+        app:layout_constraintHorizontal_bias="0.973"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -32,13 +32,13 @@
         android:layout_width="322dp"
         android:layout_height="322dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginBottom="20dp"
         android:scrollbars="vertical"
         android:text="Log"
+        app:layout_constraintBottom_toTopOf="@+id/set_ip"
         app:layout_constraintEnd_toEndOf="@+id/set_ip"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/set_ip" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/manual_set"
@@ -67,12 +67,11 @@
         android:id="@+id/connect_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="96dp"
+        android:layout_marginEnd="100dp"
         android:text="Connect"
-        app:layout_constraintBottom_toBottomOf="@+id/view_temp"
-        app:layout_constraintEnd_toStartOf="@+id/view_temp"
-        app:layout_constraintTop_toTopOf="@+id/view_temp"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintBottom_toBottomOf="@+id/set_ip"
+        app:layout_constraintEnd_toStartOf="@+id/set_ip"
+        app:layout_constraintTop_toTopOf="@+id/set_ip" />
 
     <Button
         android:id="@+id/set_pref"
@@ -86,6 +85,20 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/manual_set"
         app:layout_constraintTop_toBottomOf="@+id/info_tv"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/set_prio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="40dp"
+        android:text="Priority"
+        app:layout_constraintBottom_toTopOf="@+id/set_pref"
+        app:layout_constraintEnd_toEndOf="@+id/set_pref"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/set_pref"
+        app:layout_constraintTop_toBottomOf="@+id/set_ip"
         app:layout_constraintVertical_bias="1.0" />
 
 </android.support.constraint.ConstraintLayout>
