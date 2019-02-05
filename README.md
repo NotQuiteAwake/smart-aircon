@@ -17,4 +17,5 @@ Many functions are yet complete, but any advise would be welcomed.
 - [ ] Implementation of a Tag System to describe user status
 - [ ] Raspberry Pi migration for the data collection code
 - [ ] UI rearrangement
-- [ ] Code rearrangement (OOP Optimization)
+- [ ] Java code rearrangement (OOP Optimization)
+- [ ] Python code encapsulation (Class: Person)
