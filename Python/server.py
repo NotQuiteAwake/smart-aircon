@@ -3,6 +3,7 @@ from multiprocessing import Value, Lock, Manager
 from ctypes import c_char_p
 from person_class import Person
 from state_class import State
+import json
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -21,6 +22,7 @@ mutex = Lock()
 prime_user = Value(c_char_p, "default")
 state = manager.dict()
 
+
 @app.route('/')
 def service_test():
 	return jsonify({'description': 'smart-air-conditioner'})
@@ -37,43 +39,10 @@ def handle_task():
 		abort(400)
 	task = {}
 	# TODO: test usability
-	for key, value in request.json:
-		task[key] = value
+	task = json.loads(request.get_data())
 	tasks.append(task)
+	app.logger.error(request.get_data())
 	return jsonify({"status": 1})
-
-
-'''
-	if cmd in {'data_req', 'check_init_state', 'request_member_list'}:
-		task = {'cmd': cmd}
-	elif cmd == 'modify_exp_temp':
-		task = {
-			'cmd': cmd,
-			'exp_time': request.json['exp_time'],
-			'exp_temp': request.json['exp_temp'],
-			'person_id': request.json['person_id']
-		}
-	elif cmd == 'modify_exp_time':
-		task = {
-			'cmd': cmd,
-			'exp_time': request.json['exp_time']
-		}
-		# TODO request_exp
-	elif cmd == 'request_exp':
-		task = {
-			'cmd': cmd,
-			'person_id': request.json['person_id']
-		}
-		# TODO add_person
-	elif cmd == 'add_person':
-		task = {
-			'cmd': cmd,
-			'person_id': request.json['person_id'],
-			'exp_time': request.json['exp_time']
-		}
-	else:
-		return jsonify({'status': -1})
-'''
 
 
 @app.route('/data_fetch', methods=['GET'])
@@ -116,6 +85,7 @@ def comp_task():
 			return jsonify({'status': 1, 'member_list': users.keys()})
 
 		elif cmd == 'get_exp_temp':
+			app.logger.info(task)
 			person_id = task['person_id']
 			if person_id in users:
 				return jsonify({'status': 1, 'exp_temp': users[person_id].get_exp_temp()})
@@ -183,6 +153,7 @@ def comp_task():
 # TODO: add default state
 # TODO: add state_dict into the param as a manager.dict()
 # TODO: add precautions for state nonexistent
+# TODO: add individual thread for updating the params instead of in the hardware.py
 
 
 def run(init_state_v, nxt_time_v, exp_dict, temp_arr, p_nxt_time_v, cur_stamp_v, prime_user_s, state_dict):
@@ -205,9 +176,9 @@ if __name__ == '__main__':
 	global users, temp
 	print("Running in DEMO mode.")
 	init_state.value = 1
+	users = manager.dict()
 	users['default'] = Person()
 	for i in range(24):
 		temp.append(i)
-		users['default'].get_exp_temp().append(i)
 
 	app.run(host='127.0.0.1', port=8080)

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -33,7 +34,7 @@ public class EditExpActivity extends Activity {
     private ArrayList<BarEntry> yValues = new ArrayList<>();
 
     private Networking network = new Networking(PORT_NUMBER);
-    private String ip_address = null, person_id = null;
+    private String ip_address = null, person_id = "default";
     private List<Double> exp_list = new ArrayList<>();
     private Thread get_exp_thread = null;
 

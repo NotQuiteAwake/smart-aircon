@@ -2,14 +2,7 @@ from state_class import State
 
 
 class Person:
-	def __init__(self):
-		self.mIsPresent = False
-		self.mPersonId = ""
-		self.mPriority = 0
-		self.mExpTemp = [x for x in range(24)]
-		self.mState = State()
-
-	def __init__(self, person_id, exp_temp, priority=0, state=State()):
+	def __init__(self, person_id = "", exp_temp = [x for x in range(24)], priority=0, state=State()):
 		self.mIsPresent = False
 		self.mExpTemp = exp_temp
 		self.mPriority = priority
