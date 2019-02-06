@@ -3,6 +3,7 @@ package com.ota.jimmychen.ota;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -12,6 +13,17 @@ public class MemberManagerActivity extends Activity {
     private static String ip_address = "";
     private static final int PORT_NUMBER = 8080;
     private Networking network = new Networking(PORT_NUMBER);
+
+    List<String> member_list;
+    private final Handler handler = new Handler();
+    final Runnable setMemberAdapterRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mAdapter = new listAdapter(member_list, network);
+            mRecyclerView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+        }
+    };
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -36,9 +48,9 @@ public class MemberManagerActivity extends Activity {
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
+        mRecyclerView.setItemViewCacheSize(-1);
         setMemberAdapter();
     }
 
@@ -50,9 +62,8 @@ public class MemberManagerActivity extends Activity {
             public void run() {
                 // TODO: apply better methods for interrupting.
                 if (Thread.currentThread().isInterrupted()) { return; }
-                List<String> member_list = network.getMemberList();
-                mAdapter = new listAdapter(member_list, network);
-                mRecyclerView.setAdapter(mAdapter);
+                member_list = network.getMemberList();
+                handler.post(setMemberAdapterRunnable);
             }
         });
         get_member_thread.start();

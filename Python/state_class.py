@@ -1,10 +1,5 @@
 class State:
-
-	def __init__(self):
-		self.mStateId = "default"
-		self.mTempDiff = 0
-
-	def __init__(self, state_id, temp_diff=0):
+	def __init__(self, state_id="default", temp_diff=0):
 		self.mStateId = state_id
 		self.mTempDiff = temp_diff
 

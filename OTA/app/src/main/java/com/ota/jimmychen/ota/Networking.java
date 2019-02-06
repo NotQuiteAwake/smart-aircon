@@ -79,36 +79,10 @@ public class Networking {
                     .url(urlStr + "/post_tasks")
                     .post(requestBody)
                     .build();
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    //Toast.makeText(MainActivity.this, "POST failed", Toast.LENGTH_SHORT);
-                    //              showToast("POST Failed");
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    String repStr = response.body().string();
-                    if (repStr != null) {
-                        try {
-                            JSONObject repJSON = new JSONObject(repStr);
-                            int status = repJSON.getInt("status");
-                            if (status == 1) {
-                                //Toast.makeText(MainActivity.this, "Submit Successful(1)", Toast.LENGTH_SHORT).show()
-                                // showToast("successful.");
-                            } else if (status == -1) {
-                                //Toast.makeText(MainActivity.this, "Submit Failed(-1)", Toast.LENGTH_SHORT).show();
-                                // showToast("failed.");
-                            }
-                        } catch (JSONException e) { /*And what can I possibly say?*/ }
-                    }
-                }
-            });
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            //Toast.makeText(MainActivity.this, "Illegal Address.", Toast.LENGTH_SHORT).show();
-            // showToast("illegal address");
-        }
+            Response response = httpClient.newCall(request).execute();
+            // TODO: throws exception regarding the response.
+        } catch (IllegalArgumentException e) { e.printStackTrace();
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     private String getData(final String urlstr) {
@@ -163,7 +137,9 @@ public class Networking {
         List<Double> exp_temp = new ArrayList<>();
         try {
             req.put("cmd", "get_exp_temp");
+            Log.i(CLASS_TAG, person_id);
             req.put("person_id", person_id);
+            Log.i(CLASS_TAG, req.toString());
             postRequest(IP_ADDRESS, req);
             JSONObject json = new JSONObject(getData(IP_ADDRESS));
             exp_temp = strToDouble(jsonToArray(json.getJSONArray("exp_temp")));
@@ -193,7 +169,7 @@ public class Networking {
     public String getStatJson() {
         JSONObject req = new JSONObject();
         try {
-            req.put("cmd", "getStat");
+            req.put("cmd", "get_stat");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -260,13 +236,15 @@ public class Networking {
         JSONObject req = new JSONObject();
         try { req.put("cmd", "get_member_list"); }
         catch (JSONException e) { e.printStackTrace(); }
+        postRequest(IP_ADDRESS, req);
         String res = getData(IP_ADDRESS);
         // TODO: variable name unification
-        List<String> member_list = null;
+        List<String> member_list = new ArrayList<>();
         try {
             JSONObject json = new JSONObject(res);
             member_list = jsonToArray(json.getJSONArray("member_list"));
         } catch (JSONException e) { e.printStackTrace(); }
+        Log.i(CLASS_TAG, "member_list: " + member_list);
         return member_list;
     }
 

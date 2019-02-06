@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, EditExpActivity.class);
                 intent.putExtra("ip_address", ip_address);
+                // TODO: should be replaced by the prime_user
+                intent.putExtra("person_id", "default");
                 startActivity(intent);
             }
         });
@@ -210,10 +212,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 isInitialized = false;
+                info_tv.setText("The connection has been established.\nHowever, initialization is not yet done.");
                 while (!isInitialized) {
                     updateInitState(ip_address);
                     if (Thread.currentThread().isInterrupted()) { return; }
-                    info_tv.setText("The connection has been established.\nHowever, initialization is not yet done.");
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
