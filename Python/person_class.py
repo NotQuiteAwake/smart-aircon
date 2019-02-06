@@ -2,20 +2,22 @@ from state_class import State
 
 
 class Person:
-	mIsPresent = False
-	mPersonId = ""
-	mPriority = 0
-	mExp = [x for x in range(24)]
-	mState = State()
+	def __init__(self):
+		self.mIsPresent = False
+		self.mPersonId = ""
+		self.mPriority = 0
+		self.mExpTemp = [x for x in range(24)]
+		self.mState = State()
 
-	def __init__(self, person_id, exp, priority=0, temp_diff=0):
-		self.mExp = exp
+	def __init__(self, person_id, exp_temp, priority=0, state=State()):
+		self.mIsPresent = False
+		self.mExpTemp = exp_temp
 		self.mPriority = priority
 		self.mPersonId = person_id
-		self.mState = State(self.mPersonId, temp_diff)
+		self.mState = state
 
-	def get_exp(self):
-		return self.mExp
+	def get_exp_temp(self):
+		return self.mExpTemp
 
 	def get_presence(self):
 		return self.mIsPresent
@@ -29,8 +31,8 @@ class Person:
 	def get_state(self):
 		return self.mState
 
-	def set_exp(self, exp):
-		self.mExp = exp
+	def set_exp_temp(self, exp_time, exp_temp):
+		self.mExpTemp[exp_time] = exp_temp
 
 	def set_presence(self, presence):
 		self.mIsPresent = presence
