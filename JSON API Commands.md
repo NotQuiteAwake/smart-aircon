@@ -12,6 +12,7 @@ The file lists all the API commands that are available through JSON.
 // provides the list of variables that are returned by the server.
 !not-yet-implemented
 *ready-to-use
+?optional
 ```
 
 ```JAVA
@@ -35,18 +36,18 @@ The file lists all the API commands that are available through JSON.
     *status
     *temp
     *exp
-    !exp_temp // current enabled set of exp
+    *exp_temp // current enabled set of exp
     *time
     *p_time // predicted time
     ```
 
-- ~~modify_exp_temp~~
+- *modify_exp_temp*
 
     ```JAVA
     @param
     *exp_time
     *exp_temp
-    !person_id // the id of the person whose exp is to be modified
+    *person_id // the id of the person whose exp is to be modified
     *
     ```
     ```JAVA
@@ -74,7 +75,7 @@ The file lists all the API commands that are available through JSON.
     *member_list
     ```
 
-- *!request_exp_temp*
+- *request_exp_temp*
 
     ```JAVA
     @param
@@ -84,8 +85,7 @@ The file lists all the API commands that are available through JSON.
     ```JAVA
     @return
     *status
-    *exp
-    !exp_temp
+    *exp_temp
     ```
 
 - *request_prime_user*
@@ -96,130 +96,122 @@ The file lists all the API commands that are available through JSON.
     *prime_user
     ```
 
-- ~~set_user_presence~~
+- *set_user_presence*
 
     ```JAVA
     @param
-    !person_id
-    !presense
+    *person_id
+    *presense
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~set_user_priority~~
+- *set_user_priority*
     
     ```JAVA
     @param
-    !person_id
-    !priority
+    *person_id
+    *priority
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~set_user_state~~
+- *set_user_state*
     
     ```JAVA
     @param
-    !person_id
-    !state_id
+    *person_id
+    *state_id
     ```
     
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~add_state~~
+- *add_state*
 
     ```JAVA
     @param
-    !state_id
-    !temp_diff
+    *state_id
+    *temp_diff
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~remove_state~~
+- *remove_state*
 
     ```JAVA
     @param
-    !state_id
+    *state_id
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~set_state~~
+- *set_state*
 
     ```JAVA
     @param
-    !state_id
-    !temp_diff
+    *state_id
+    *temp_diff
     ```
 
     ```JAVA
-    !status
+    *status
     ```
 
-- ~~add_user~~
+- *add_user*
 
     ```JAVA
     @param
-    !person_id
-    !priority
-    !exp_temp
+    *person_id
+    ?exp_temp // 'default' if void.
+    ?priority // 'default' if void.
+    ?state_id // 'default' if void.
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~remove_user~~
+- *remove_user*
 
     ```JAVA
     @param
-    !person_id
+    *person_id
     ```
 
     ```JAVA
     @return
-    !status
+    *status
     ```
 
-- ~~get_user_state~~
+- *get_user*
 
     ```JAVA
     @param
-    !person_id
+    *person_id
     ```
 
     ```JAVA
     @return
-    !status
-    !state
-    ```
-
-- ~~get_user_priority~~
-
-    ```JAVA
-    @param
-    !person_id
-    ```
-
-    ```JAVA
-    @return
-    !status
-    !priority
+    *status
+    ?person_id // void if status = -1
+    ?state_id // void if status = -1
+    ?exp_temp
+    ?priority
+    ?presence
     ```
