@@ -45,3 +45,12 @@ class Person:
 
 	def set_state(self, state):
 		self.mState = state
+
+	def to_dict(self):
+		return {'status': 1,
+				"person_id": self.get_person_id(),
+				"exp_temp": self.get_exp_temp(),
+				"state_id": self.get_state().get_state_id(),
+				"presence": 1 if self.get_present() else 0,
+				"priority": self.get_priority()
+				}

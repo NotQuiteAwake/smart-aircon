@@ -1,6 +1,4 @@
 class State:
-	mStateId = "default"
-	mTempDiff = 0
 
 	def __init__(self):
 		self.mStateId = "default"

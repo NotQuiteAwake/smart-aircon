@@ -1,8 +1,11 @@
 # JSON API Commands
-### Introduction
-The file lists all the API commands that are available through JSON. 
 
-### What does it mean?
+## Introduction
+
+The file lists all the API commands that are available through JSON.
+
+## What it means
+
 ~~Strikethrough~~ commands are not ready-to-go yet.
 
 *Italic* commands are implemented but not tested.
@@ -17,19 +20,20 @@ The file lists all the API commands that are available through JSON.
 
 ```JAVA
 @param
-// provdes the list of parameters to be sent along with the command. 
+// provdes the list of parameters to be sent along with the command.
 ```
 
-### List of Commands
+## List of Commands
+
 - check_init_state
-    
+
     ```JAVA
-    @return 
+    @return
     *status
     *init_state
     ```
 
-- *data_req*
+- *get_stat*
 
     ```JAVA
     @return
@@ -41,7 +45,7 @@ The file lists all the API commands that are available through JSON.
     *p_time // predicted time
     ```
 
-- *modify_exp_temp*
+- *set_exp_temp*
 
     ```JAVA
     @param
@@ -55,7 +59,7 @@ The file lists all the API commands that are available through JSON.
     *status
     ```
 
-- *modify_exp_time*
+- *set_exp_time*
 
     ```JAVA
     @param
@@ -67,7 +71,7 @@ The file lists all the API commands that are available through JSON.
     *status
     ```
 
-- *request_member_list*
+- *get_member_list*
 
     ```JAVA
     @return
@@ -75,7 +79,7 @@ The file lists all the API commands that are available through JSON.
     *member_list
     ```
 
-- *request_exp_temp*
+- *get_exp_temp*
 
     ```JAVA
     @param
@@ -88,7 +92,7 @@ The file lists all the API commands that are available through JSON.
     *exp_temp
     ```
 
-- *request_prime_user*
+- *get_prime_user*
 
     ```JAVA
     @return
@@ -110,7 +114,7 @@ The file lists all the API commands that are available through JSON.
     ```
 
 - *set_user_priority*
-    
+
     ```JAVA
     @param
     *person_id
@@ -123,13 +127,13 @@ The file lists all the API commands that are available through JSON.
     ```
 
 - *set_user_state*
-    
+
     ```JAVA
     @param
     *person_id
     *state_id
     ```
-    
+
     ```JAVA
     @return
     *status

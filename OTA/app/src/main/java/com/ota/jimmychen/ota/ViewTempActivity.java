@@ -12,9 +12,6 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,17 +51,7 @@ public class ViewTempActivity extends Activity {
         get_temp_thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                JSONObject req = new JSONObject();
-                try {
-                    req.put("cmd", "data_req");
-                } catch (JSONException e) { e.printStackTrace(); /* Nujabes is the great producer */ }
-                network.post_request(ip_address, req);
-                List<String> temp = new ArrayList<>();
-                try {
-                    JSONObject data = new JSONObject(network.get_data(ip_address));
-                    temp = network.json_to_array(data.getJSONArray("temp"));
-                } catch (JSONException e) { e.printStackTrace(); }
-                if (temp != null) temp_list = network.str_to_double(temp);
+                temp_list = network.getTemp();
             }
         });
         get_temp_thread.run();
