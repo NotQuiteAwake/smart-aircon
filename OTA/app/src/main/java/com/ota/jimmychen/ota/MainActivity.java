@@ -6,21 +6,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String ACTIVITY_TAG=MainActivity.class.getSimpleName();
@@ -46,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (active_before_restore) {
-            data_proc(ip_address);
+            dataProc(ip_address);
         }
     }
 
@@ -55,6 +50,13 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         if (data_proc_thread != null) { data_proc_thread.interrupt(); active_before_restore = true; }
         if (task_post_thread != null) { task_post_thread.interrupt(); active_before_restore = true; }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (data_proc_thread != null) data_proc_thread.interrupt();
+        if (task_post_thread != null) task_post_thread.interrupt();
     }
 
     @Override
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
-                intent.setClass(MainActivity.this, SetPriorityActivity.class);
+                intent.setClass(MainActivity.this, MemberManagerActivity.class);
                 intent.putExtra("ip_address", ip_address);
                 startActivity(intent);
             }
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i("connect", ip_address);
-                data_proc(ip_address);
+                dataProc(ip_address);
             }
         });
 
@@ -102,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                // TODO: There are usages of ip_address that didn't come with http://
                                 ip_address = "http://" + et.getText().toString();
+                                network.setIp(ip_address);
                             }
                         })
                         .setNegativeButton("Cancel", null).show();
@@ -123,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     pref = et.getText().toString();
-                                    predict_alter(ip_address, pref);
+                                    predictAlter(ip_address, pref);
                                     Log.i("set_param", "Request Made");
                                 }
                             })
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         scan();
     }
 
-    public void predict_alter(final String ip_address, final String pref) {
+    public void predictAlter(final String ip_address, final String pref) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -170,21 +174,9 @@ public class MainActivity extends AppCompatActivity {
                 task_post_thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        JSONObject req = new JSONObject();
                         double exp_time = Double.parseDouble(pref);
-                        try {
-                            req.put("cmd", "modify_exp_time");
-                            req.put("exp_time", exp_time);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        network.post_request(ip_address, req);
-                        String res = network.get_data(ip_address);
-                        try {
-                            JSONObject json_res = new JSONObject(res);
-                            int status = json_res.getInt("status");
-
-                        } catch (JSONException e) { e.printStackTrace(); }
+                        int status = network.setExpTime(exp_time);
+                        if (status == -1) { Log.e(ACTIVITY_TAG, "setExpTime error"); }
                     }
                 });
                 task_post_thread.start();
@@ -192,20 +184,8 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void update_init_state(String ip_address) {
-        try {
-            JSONObject req = new JSONObject();
-            req.put("cmd", "check_init_state");
-            network.post_request(ip_address, req);
-            JSONObject response = new JSONObject(network.get_data(ip_address));
-            if (response.getInt("status") == -1) { Log.e(MainActivity.ACTIVITY_TAG, "update_init_state failed to fetch state."); }
-            else {
-                int init_state_int = response.getInt("init_state");
-                if (init_state_int > 0) { isInitialized = true; }
-                else isInitialized = false;
-            }
-        } catch (JSONException e) { e.printStackTrace(); }
-
+    private void updateInitState(String ip_address) {
+        isInitialized = network.getInitState();
     }
 
     public void scan() {
@@ -221,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    public void data_proc(final String ip_address) {
+    public void dataProc(final String ip_address) {
         if (data_proc_thread != null) {
             Toast.makeText(MainActivity.this, "Thread exists. Restarting.", Toast.LENGTH_SHORT).show();
             data_proc_thread.interrupt();
@@ -231,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 isInitialized = false;
                 while (!isInitialized) {
-                    update_init_state(ip_address);
+                    updateInitState(ip_address);
                     if (Thread.currentThread().isInterrupted()) { return; }
                     info_tv.setText("The connection has been established.\nHowever, initialization is not yet done.");
                     try {
@@ -242,40 +222,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 while (true) {
-                    String output = "";
                     if (Thread.currentThread().isInterrupted()) { return; }
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
+                        Log.i(ACTIVITY_TAG, "dataProc interrupted during sleep()");
                         e.printStackTrace();
                         return;
                     }
-                    JSONObject json = new JSONObject();
-                    try {
-                        json.put("cmd", "data_req");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    network.post_request(ip_address, json);
-                    String res = network.get_data(ip_address);
-                    try {
-                        JSONObject json_rep = new JSONObject(res);
-                        int status = json_rep.getInt("status");
-                        if (status == 1) {
-                            List<String> temp = network.json_to_array(json_rep.getJSONArray("temp"));
-                            List<String> exp = network.json_to_array(json_rep.getJSONArray("exp"));
-                            int time = json_rep.getInt("time");
-                            int p_time = json_rep.getInt("p_time");
-                            output = "";
-                            output = output + "Current time:\n" + time + "\n";
-                            output = output + "Temperature records:\n" + String.join(",", temp) + "\n";
-                            output = output + "Expected Temperature:\n" + String.join(",", exp) + "\n";
-                            output = output + "Next predicted turn-on time:\n" + p_time + "\n";
-                        } else if (status == -1) {
-                            output = "Fetch failed: " + status;
-                            Log.e(MainActivity.ACTIVITY_TAG + " data_proc", "status = -1");
-                        }
-                    } catch (JSONException e){ e.printStackTrace(); /*I guess that I forgive you*/ }
+                    String output = network.getStat();
                     info_tv.setText(output);
                 }
             }

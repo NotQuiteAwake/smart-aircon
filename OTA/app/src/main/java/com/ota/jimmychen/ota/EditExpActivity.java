@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -18,16 +17,15 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+// Implement person_id: retrieve info from Intent
 public class EditExpActivity extends Activity {
     private static final int PORT_NUMBER = 8080;
     private BarChart expChart = null;
@@ -35,7 +33,7 @@ public class EditExpActivity extends Activity {
     private ArrayList<BarEntry> yValues = new ArrayList<>();
 
     private Networking network = new Networking(PORT_NUMBER);
-    private String ip_address = null;
+    private String ip_address = null, person_id = null;
     private List<Double> exp_list = new ArrayList<>();
     private Thread get_exp_thread = null;
 
@@ -48,10 +46,14 @@ public class EditExpActivity extends Activity {
 
         Intent intent = getIntent();
         ip_address = intent.getStringExtra("ip_address");
+        person_id = intent.getStringExtra("person_id");
+
+        // TODO: check HTTP:// & check setIp()
+        network.setIp(ip_address);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                getTemp();
+                getTemp(person_id);
                 initData((ArrayList<Double>) exp_list);
                 initBarChart();
             }
@@ -59,22 +61,12 @@ public class EditExpActivity extends Activity {
     }
 
     // TODO: Put those methods into the Networking class to improve reusability.
-    private void getTemp() {
+    private void getTemp(final String person_id) {
         if (get_exp_thread != null) { get_exp_thread.interrupt(); }
         get_exp_thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                JSONObject req = new JSONObject();
-                try {
-                    req.put("cmd", "data_req");
-                } catch (JSONException e) { e.printStackTrace(); /* Nujabes is the great producer */ }
-                network.post_request(ip_address, req);
-                List<String> exp = new ArrayList<>();
-                try {
-                    JSONObject data = new JSONObject(network.get_data(ip_address));
-                    exp = network.json_to_array(data.getJSONArray("exp"));
-                } catch (JSONException e) { e.printStackTrace(); }
-                if (exp != null) exp_list = network.str_to_double(exp);
+                exp_list = network.getExpTemp(person_id);
             }
         });
         get_exp_thread.run();
@@ -141,14 +133,8 @@ public class EditExpActivity extends Activity {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        try {
-                                            JSONObject req = new JSONObject();
-                                            req.put("cmd", "modify_exp_temp");
-                                            req.put("exp_temp", exp_temp);
-                                            req.put("exp_time", index);
-                                            network.post_request(ip_address, req);
-                                            network.get_data(ip_address);
-                                        } catch (JSONException e) { e.printStackTrace(); }
+                                        // TODO: implement person_id
+                                        network.setExpTemp(person_id, index, exp_temp);
                                     }
                                 }).start();
                                 yValues.set(index, new BarEntry(index, double_to_float(exp_temp)));

@@ -89,12 +89,12 @@ def comp_task():
 		if cmd == 'check_init_state':
 			return jsonify({'status': 1, 'init_state': init_state.value})
 
-		elif cmd == 'data_req':
+		elif cmd == 'get_stat':
 			temp_list = [x for x in temp]
 			exp_list = users[prime_user.value].get_exp_temp()
 			return jsonify({'status': 1, 'temp': temp_list, 'exp_temp': exp_list, 'time': cur_stamp.value % 24, 'p_time': p_nxt_time.value})
 
-		elif cmd == 'modify_exp_temp':
+		elif cmd == 'set_exp_temp':
 			person_id = task['person_id']
 			exp_time = task['exp_time']
 			exp_temp = task['exp_temp']
@@ -106,23 +106,23 @@ def comp_task():
 			else:
 				return jsonify({'status': -1})
 
-		elif cmd == 'modify_exp_time':
+		elif cmd == 'set_exp_time':
 			if mutex.acquire():
 				nxt_time.value = task['exp_time']
 			mutex.release()
 			return jsonify({'status': 1})
 
-		elif cmd == 'request_member_list':
+		elif cmd == 'get_member_list':
 			return jsonify({'status': 1, 'member_list': users.keys()})
 
-		elif cmd == 'request_exp_temp':
+		elif cmd == 'get_exp_temp':
 			person_id = task['person_id']
 			if person_id in users:
 				return jsonify({'status': 1, 'exp_temp': users[person_id].get_exp_temp()})
 			else:
 				return jsonify({'status': -1, 'exp_temp': users['default'].get_exp_temp()})
 
-		elif cmd == 'request_prime_user':
+		elif cmd == 'get_prime_user':
 			return jsonify({'status': 1, 'prime_user': prime_user.value})
 
 		elif cmd == 'set_user_presence':
@@ -171,20 +171,8 @@ def comp_task():
 		elif cmd == 'get_user':
 			person_id = task['person_id']
 			if person_id in users.keys():
-				user = users[person_id]
-				exp_temp = user.get_exp_temp()
 				# TODO: check get_presence value correctness
-				is_present = 1 if user.get_presence() else 0
-				state_id = user.get_state().get_state_id()
-				priority = user.get_priority()
-
-				return jsonify({'status': 1,
-								"person_id": person_id,
-								"exp_temp": exp_temp,
-								"state_id": state_id,
-								"presence": is_present,
-								"priority": priority})
-
+				return jsonify(users[person_id].to_dict())
 			else:
 				return jsonify({'status': -1})
 
@@ -220,7 +208,6 @@ if __name__ == '__main__':
 	users['default'] = Person()
 	for i in range(24):
 		temp.append(i)
-		# TODO: This line won't work.
 		users['default'].get_exp_temp().append(i)
 
 	app.run(host='127.0.0.1', port=8080)

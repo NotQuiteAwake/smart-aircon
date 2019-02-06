@@ -13,10 +13,9 @@ Many functions are yet complete, but any advise would be welcomed.
 - [x] Implementation of Temperature Visualisation
 - [x] Implementation of Dialogs for interaction
 - [x] Implementation of auto-search for the server (test incomplete)
-- [ ] Implementation of a Priority System for multiple users (in progress)
-- [ ] Python code encapsulation (in progress)
-- [ ] Implementation of a Tag System to describe user status
+- [x] Code encapsulation (Person, State, Networking)
+- [ ] Implementation of a Priority System for multiple users (server & app in progress)
+- [ ] Implementation of a Tag System to describe user status (server in progress)
 - [ ] Raspberry Pi migration for the data collection code
 - [ ] UI rearrangement
-- [ ] Java code rearrangement (OOP Optimization)
 - [ ] Java variable naming improvement
