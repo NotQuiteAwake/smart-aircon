@@ -146,8 +146,19 @@ def comp_task():
 			else:
 				return jsonify({'status': -1})
 
+		elif cmd == 'set_name':
+			person_id = task['person_id']
+			name = task['name']
+			users[name] = users[person_id]
+			del users[person_id]
+			return jsonify({'status': 1})
+
+		elif cmd == 'get_state_list':
+			return jsonify({'status': 1, 'state_list': states.keys()})
+
 		else:
 			return jsonify({'status': -1})
+
 
 # TODO: add mutex lock
 # TODO: add default state
@@ -160,7 +171,7 @@ def run(init_state_v, nxt_time_v, exp_dict, temp_arr, p_nxt_time_v, cur_stamp_v,
 	log.setLevel(logging.ERROR)
 	# TODO: synchronize prime_user as a Value with type String (person_id)
 	# TODO: write a custom Manager class
-	global users, temp, nxt_time, init_state, p_nxt_time, cur_stamp, prime_user, state
+	global users, temp, nxt_time, init_state, p_nxt_time, cur_stamp, prime_user, states
 	users = exp_dict
 	temp = temp_arr
 	nxt_time = nxt_time_v
@@ -168,16 +179,19 @@ def run(init_state_v, nxt_time_v, exp_dict, temp_arr, p_nxt_time_v, cur_stamp_v,
 	p_nxt_time = p_nxt_time_v
 	cur_stamp = cur_stamp_v
 	prime_user = prime_user_s
-	state = state_dict
+	states = state_dict
 	app.run(host='0.0.0.0', port=8080)
 
 
 if __name__ == '__main__':
-	global users, temp
+	global users, temp, states
 	print("Running in DEMO mode.")
 	init_state.value = 1
+	states = manager.dict()
 	users = manager.dict()
+	# TODO: add state default for normal mode
 	users['default'] = Person()
+	states['default'] = State()
 	for i in range(24):
 		temp.append(i)
 

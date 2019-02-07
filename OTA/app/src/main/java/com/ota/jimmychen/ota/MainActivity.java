@@ -279,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
                 view_temp.setEnabled(enabled);
                 set_next_time.setEnabled(enabled);
                 manage_member.setEnabled(enabled);
-                scan_bt.setEnabled(enabled);
             }
         });
     }

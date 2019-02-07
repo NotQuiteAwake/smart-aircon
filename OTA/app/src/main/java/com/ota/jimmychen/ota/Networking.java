@@ -2,8 +2,6 @@ package com.ota.jimmychen.ota;
 
 import android.util.Log;
 
-import com.alibaba.fastjson.JSON;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -258,6 +256,77 @@ public class Networking {
         } catch (JSONException e) { e.printStackTrace(); }
         Log.i(CLASS_TAG, "member_list: " + member_list);
         return member_list;
+    }
+
+    public void setPriority(String person_id, int priority) {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "set_user_priority");
+            req.put("person_id", person_id);
+            req.put("priority", priority);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) { e.printStackTrace(); }
+    }
+
+    public String getUserJson(String person_id) {
+        String res = "";
+        try {
+            JSONObject req = new JSONObject();
+            req.put("cmd", "get_user");
+            req.put("person_id", person_id);
+            postRequest(IP_ADDRESS, req);
+            res = getData(IP_ADDRESS);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public void setPresence(String person_id, boolean isPresent) {
+        try {
+            JSONObject req = new JSONObject();
+            req.put("cmd", "set_user_presence");
+            req.put("person_id", person_id);
+            req.put("presence", isPresent ? 1 : 0);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) { e.printStackTrace(); }
+    }
+
+    public void setState(String person_id, String state_id) {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "set_user_state");
+            req.put("person_id", person_id);
+            req.put("state_id", state_id);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setName(String person_id, String name) {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "set_name");
+            req.put("person_id", person_id);
+            req.put("name", name);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch(JSONException e) { e.printStackTrace(); }
+    }
+
+    public List<String> getStateList() {
+        List<String> list = new ArrayList<>();
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "get_state_list");
+            postRequest(IP_ADDRESS, req);
+            list = jsonToArray(new JSONObject(getData(IP_ADDRESS)).getJSONArray("state_list"));
+        } catch (JSONException e) { e.printStackTrace(); }
+        return list;
     }
 
     private List<String> jsonToArray(JSONArray jArray) {
