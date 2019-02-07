@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Window;
 
 import java.util.List;
 
@@ -52,6 +54,7 @@ public class MemberManagerActivity extends Activity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemViewCacheSize(-1);
         setMemberAdapter();
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
     }
 
     // TODO: make sure every server list has a built-in default option
@@ -60,7 +63,6 @@ public class MemberManagerActivity extends Activity {
         get_member_thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                // TODO: apply better methods for interrupting.
                 if (Thread.currentThread().isInterrupted()) { return; }
                 member_list = network.getMemberList();
                 handler.post(setMemberAdapterRunnable);

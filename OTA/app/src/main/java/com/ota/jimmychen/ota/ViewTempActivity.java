@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -24,6 +25,7 @@ public class ViewTempActivity extends Activity {
     private String ip_address = null;
     private List<Double> temp_list = new ArrayList<>();
     private Thread get_temp_thread = null;
+    private static final int TEAL_COLOR = Color.parseColor("#008080");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,6 @@ public class ViewTempActivity extends Activity {
         }).start();
     }
 
-    // TODO: Put those methods into the Networking class to improve reusability.
     private void getTemp() {
         if (get_temp_thread != null) { get_temp_thread.interrupt(); }
         get_temp_thread = new Thread(new Runnable() {
@@ -67,7 +68,7 @@ public class ViewTempActivity extends Activity {
             yValues.add(new BarEntry(x, double_to_float(data.get(x))));
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Temperature Record");
-        barDataSet.setColor(Color.BLACK);
+        barDataSet.setColor(TEAL_COLOR);
         tempData = new BarData(barDataSet);
     }
 
@@ -98,6 +99,9 @@ public class ViewTempActivity extends Activity {
         tempChart.setScaleXEnabled(true);
         tempChart.setScaleYEnabled(false);
         tempChart.setDoubleTapToZoomEnabled(false);
+        tempChart.notifyDataSetChanged();
+        tempChart.invalidate();
     }
+
 
 }

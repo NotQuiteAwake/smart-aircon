@@ -7,98 +7,111 @@
     android:focusableInTouchMode="true"
     tools:context=".MainActivity">
 
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="364dp" />
-
     <Button
         android:id="@+id/set_ip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="348dp"
         android:layout_marginEnd="8dp"
         android:text="@string/set"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/info_tv"
-        android:layout_width="322dp"
-        android:layout_height="322dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="20dp"
-        android:scrollbars="vertical"
-        android:text="Log"
-        app:layout_constraintBottom_toTopOf="@+id/set_ip"
-        app:layout_constraintEnd_toEndOf="@+id/set_ip"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/connectivity_title"
+        app:layout_constraintEnd_toStartOf="@+id/scan_button"
+        app:layout_constraintStart_toEndOf="@+id/connectivity_title"
+        app:layout_constraintTop_toTopOf="@+id/connectivity_title" />
 
     <Button
         android:id="@+id/manual_set"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="84dp"
         android:text="ALTER"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/set_ip"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/info_tv" />
+        app:layout_constraintBottom_toBottomOf="@+id/next_time_tv"
+        app:layout_constraintEnd_toEndOf="@+id/manage_member"
+        app:layout_constraintStart_toStartOf="@+id/manage_member"
+        app:layout_constraintTop_toTopOf="@+id/next_time_tv" />
 
     <Button
         android:id="@+id/view_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:text="Temp"
+        app:layout_constraintBottom_toBottomOf="@+id/temp_history"
         app:layout_constraintEnd_toEndOf="@+id/manual_set"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/manual_set"
-        app:layout_constraintTop_toBottomOf="@+id/manual_set" />
+        app:layout_constraintTop_toTopOf="@+id/temp_history" />
 
     <Button
-        android:id="@+id/connect_button"
+        android:id="@+id/scan_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="100dp"
-        android:text="Connect"
+        android:layout_marginEnd="48dp"
+        android:text="SCAN"
         app:layout_constraintBottom_toBottomOf="@+id/set_ip"
-        app:layout_constraintEnd_toStartOf="@+id/set_ip"
-        app:layout_constraintTop_toTopOf="@+id/set_ip" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/set_ip"
+        app:layout_constraintVertical_bias="0.0" />
 
     <Button
-        android:id="@+id/set_pref"
+        android:id="@+id/manage_member"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="44dp"
-        android:text="Pref"
-        app:layout_constraintBottom_toTopOf="@+id/manual_set"
-        app:layout_constraintEnd_toEndOf="@+id/manual_set"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/manual_set"
-        app:layout_constraintTop_toBottomOf="@+id/info_tv"
-        app:layout_constraintVertical_bias="1.0" />
+        android:text="Manage"
+        app:layout_constraintBottom_toBottomOf="@+id/my_family_tv"
+        app:layout_constraintEnd_toEndOf="@+id/scan_button"
+        app:layout_constraintStart_toStartOf="@+id/scan_button"
+        app:layout_constraintTop_toTopOf="@+id/my_family_tv" />
 
-    <Button
-        android:id="@+id/set_prio"
+    <TextView
+        android:id="@+id/connectivity_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="40dp"
-        android:text="Priority"
-        app:layout_constraintBottom_toTopOf="@+id/set_pref"
-        app:layout_constraintEnd_toEndOf="@+id/set_pref"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/set_pref"
-        app:layout_constraintTop_toBottomOf="@+id/set_ip"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="136dp"
+        android:text="Connectivity"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/connectivity_tv"
+        android:layout_width="263dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="8dp"
+        android:singleLine="false"
+        android:text="Pending Connection"
+        android:textSize="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/scan_button"
+        app:layout_constraintHorizontal_bias="0.485"
+        app:layout_constraintStart_toStartOf="@+id/connectivity_title"
+        app:layout_constraintTop_toBottomOf="@+id/set_ip" />
+
+    <TextView
+        android:id="@+id/my_family_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:text="My Family"
+        android:textSize="15dp"
+        app:layout_constraintStart_toStartOf="@+id/connectivity_title"
+        app:layout_constraintTop_toBottomOf="@+id/connectivity_tv" />
+
+    <TextView
+        android:id="@+id/next_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:text="Next Time: Not Connected"
+        app:layout_constraintStart_toStartOf="@+id/my_family_tv"
+        app:layout_constraintTop_toBottomOf="@+id/my_family_tv" />
+
+    <TextView
+        android:id="@+id/temp_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:text="Temperature History"
+        app:layout_constraintStart_toStartOf="@+id/next_time_tv"
+        app:layout_constraintTop_toBottomOf="@+id/next_time_tv" />
 
 </android.support.constraint.ConstraintLayout>

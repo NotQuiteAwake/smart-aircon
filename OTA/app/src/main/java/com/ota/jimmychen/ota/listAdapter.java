@@ -17,13 +17,28 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ListViewHolder
     private static final int PORT_NUMBER = 8080;
     private static String ip_address = "";
     private Networking mNetwork = null;
+    private static final String CLASS_TAG = "listAdapter";
 
     // TODO: implement a CardView to hold all the information of the user.
-    public static class ListViewHolder extends RecyclerView.ViewHolder {
+    public class ListViewHolder extends RecyclerView.ViewHolder {
         public TextView mTextView;
 
-        public ListViewHolder(TextView v) {
+        public ListViewHolder(final TextView v) {
             super(v);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getAdapterPosition();
+                    Log.e(CLASS_TAG, "onClick() event at position " + position);
+                    String person_id = mDataset.get(position);
+                    Intent intent = new Intent();
+                    intent.putExtra("ip_address", ip_address);
+                    intent.putExtra("person_id", person_id);
+                    Activity CurrentActivity = (Activity) v.getContext();
+                    intent.setClass(CurrentActivity, EditMemberActivity.class);
+                    CurrentActivity.startActivity(intent);
+                }
+            });
             mTextView = v;
         }
     }
@@ -35,24 +50,12 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ListViewHolder
     }
 
     @Override
+
     public ListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final TextView v = (TextView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_base, parent, false);
 
         ListViewHolder vh = new ListViewHolder(v);
-
-        v.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                String person_id = v.getText().toString();
-                Intent intent = new Intent();
-                intent.putExtra("ip_address", ip_address);
-                intent.putExtra("person_id", person_id);
-                Activity CurrentActivity = (Activity)v.getContext();
-                intent.setClass(CurrentActivity, EditExpActivity.class);
-                CurrentActivity.startActivity(intent);
-            }
-        });
 
         return vh;
     }

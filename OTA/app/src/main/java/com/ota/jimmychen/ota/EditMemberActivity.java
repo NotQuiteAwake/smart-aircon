@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.EditText;
 
@@ -20,14 +19,11 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 // Implement person_id: retrieve info from Intent
-public class EditExpActivity extends Activity {
+public class EditMemberActivity extends Activity {
     private static final int PORT_NUMBER = 8080;
     private BarChart expChart = null;
     private BarData expData = null;
@@ -38,10 +34,12 @@ public class EditExpActivity extends Activity {
     private List<Double> exp_list = new ArrayList<>();
     private Thread get_exp_thread = null;
 
+    private static final int TEAL_COLOR = Color.parseColor("#008080");
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editexp);
+        setContentView(R.layout.activity_editmember);
 
         expChart = (BarChart)findViewById(R.id.bar_chart);
 
@@ -82,7 +80,7 @@ public class EditExpActivity extends Activity {
             yValues.add(new BarEntry(x, double_to_float(data.get(x))));
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Expected Temperature");
-        barDataSet.setColor(Color.BLACK);
+        barDataSet.setColor(TEAL_COLOR);
         expData = new BarData(barDataSet);
         float barWidth = 0.45f;
         expData.setBarWidth(barWidth);
@@ -120,9 +118,9 @@ public class EditExpActivity extends Activity {
             public void onValueSelected(Entry e, Highlight h) {
                 final int index = (int)e.getX();
                 Log.i("expChart.OnChartValueSelected", "index = " + index);
-                final EditText et = new EditText(EditExpActivity.this);
+                final EditText et = new EditText(EditMemberActivity.this);
                 et.setText(String.valueOf(exp_list.get(index)));
-                new AlertDialog.Builder(EditExpActivity.this)
+                new AlertDialog.Builder(EditMemberActivity.this)
                         .setTitle("Modify Expected Temperature:")
                         .setIcon(android.R.drawable.sym_def_app_icon)
                         .setView(et)
@@ -149,5 +147,7 @@ public class EditExpActivity extends Activity {
             @Override
             public void onNothingSelected() { }
         });
+        expChart.notifyDataSetChanged();
+        expChart.invalidate();
     }
 }

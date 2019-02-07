@@ -18,4 +18,5 @@ Many functions are yet complete, but any advise would be welcomed.
 - [ ] Implementation of a Tag System to describe user status (server in progress)
 - [ ] Raspberry Pi migration for the data collection code
 - [ ] UI rearrangement
+- [ ] Implementation of Wifi/bluetooth scanning detection of present users
 - [ ] Java variable naming improvement

@@ -7,9 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,13 +25,16 @@ public class MainActivity extends AppCompatActivity {
     private boolean isInitialized = false;
     private boolean active_before_restore = false;
 
-    private TextView info_tv;
-    private Button set_ip, set_param, view_temp, connect, set_pref, set_prio;
+    private TextView conn_stat, time_stat;
+    private Button set_ip, set_next_time, view_temp, manage_member, scan_bt;
 
     private Networking network = new Networking(PORT_NUMBER);
 
     private Thread data_proc_thread = null;
     private Thread task_post_thread = null;
+    private Thread scanner_thread = null;
+
+    private Handler handler = new Handler();
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -64,18 +68,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        info_tv = (TextView)findViewById(R.id.info_tv);
-        set_ip = (Button)findViewById(R.id.set_ip);
-        set_param = (Button)findViewById(R.id.manual_set);
-        view_temp = (Button)findViewById(R.id.view_temp);
-        connect = (Button)findViewById(R.id.connect_button);
-        set_pref = (Button)findViewById(R.id.set_pref);
-        set_prio = (Button)findViewById(R.id.set_prio);
+        conn_stat = (TextView)findViewById(R.id.connectivity_tv);
+        time_stat = (TextView)findViewById(R.id.next_time_tv);
 
-        info_tv.setMovementMethod(ScrollingMovementMethod.getInstance());
+        set_ip = (Button)findViewById(R.id.set_ip);
+        set_next_time = (Button)findViewById(R.id.manual_set);
+        view_temp = (Button)findViewById(R.id.view_temp);
+        manage_member = (Button)findViewById(R.id.manage_member);
+        scan_bt = (Button)findViewById(R.id.scan_button);
+
         requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
 
-        set_prio.setOnClickListener(new View.OnClickListener() {
+        setAvailability(false);
+
+        scan_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                conn_stat.setText("Scanning for address");
+                scan();
+            }
+        });
+
+        manage_member.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
@@ -85,13 +99,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        connect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("connect", ip_address);
-                dataProc(ip_address);
-            }
-        });
+        //TODO: Mode the method inside set_ip. Start a new process + handler
 
         set_ip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // TODO: There are usages of ip_address that didn't come with http://
                                 ip_address = "http://" + et.getText().toString();
-                                network.setIp(ip_address);
+                                dataProc(ip_address);
                             }
                         })
                         .setNegativeButton("Cancel", null).show();
@@ -114,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        set_param.setOnClickListener(new View.OnClickListener() {
+        set_next_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (ip_address == null) { Toast.makeText(MainActivity.this, "Not Connected.", Toast.LENGTH_SHORT).show(); }
@@ -128,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     pref = et.getText().toString();
                                     predictAlter(ip_address, pref);
-                                    Log.i("set_param", "Request Made");
+                                    Log.i("set_next_time", "Request Made");
                                 }
                             })
                             .setNegativeButton("Cancel", null).show();
@@ -147,19 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        set_pref.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, EditExpActivity.class);
-                intent.putExtra("ip_address", ip_address);
-                // TODO: should be replaced by the prime_user
-                intent.putExtra("person_id", "default");
-                startActivity(intent);
-            }
-        });
-        scan();
     }
 
     public void predictAlter(final String ip_address, final String pref) {
@@ -191,31 +186,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void scan() {
-        new Thread(new Runnable() {
+        if (scanner_thread != null) return;
+
+        scanner_thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 NetworkScanner scanner = new NetworkScanner();
                 scanner.scan();
-                String ip = scanner.getAcAddress();
-                if (ip != null) ip_address = ip;
+                final String ip = scanner.getAcAddress();
+                if (data_proc_thread != null) return;
+                if (ip != null) ip_address = "http://" + ip;
                 Log.i(ACTIVITY_TAG, "Scan complete. Address is " + ip_address);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ip_address != null) conn_stat.setText("Located conditioner@" + ip_address + ". Now connecting.");
+                        else {
+                            conn_stat.setText("Scanning failed. Please add manually.");
+                        }
+                    }
+                });
+                if (ip != null) { dataProc(ip_address); }
             }
-        }).start();
+        });
+        scanner_thread.start();
     }
 
     public void dataProc(final String ip_address) {
+        network.setIp(ip_address);
         if (data_proc_thread != null) {
-            Toast.makeText(MainActivity.this, "Thread exists. Restarting.", Toast.LENGTH_SHORT).show();
+            Log.i(ACTIVITY_TAG, "Thread exists, restarting.");
             data_proc_thread.interrupt();
         }
         data_proc_thread = new Thread() {
             @Override
             public void run() {
                 isInitialized = false;
-                info_tv.setText("The connection has been established.\nHowever, initialization is not yet done.");
                 while (!isInitialized) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            conn_stat.setText("Connected. Waiting for initialization to finish.");
+                        }
+                    });
                     updateInitState(ip_address);
-                    if (Thread.currentThread().isInterrupted()) { return; }
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
@@ -223,8 +240,17 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
+                setAvailability(true);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conn_stat.setText("Connected to conditioner@" + ip_address);
+                    }
+                });
                 while (true) {
-                    if (Thread.currentThread().isInterrupted()) { return; }
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
@@ -232,13 +258,30 @@ public class MainActivity extends AppCompatActivity {
                         e.printStackTrace();
                         return;
                     }
-                    String output = network.getStat();
-                    info_tv.setText(output);
+                    final int next_time = network.getNextTime();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            time_stat.setText("Next Time: " + next_time);
+                        }
+                    });
                 }
             }
         };
         data_proc_thread.start();
-        Toast.makeText(MainActivity.this, "Thread started.", Toast.LENGTH_SHORT).show();
+        Log.i(ACTIVITY_TAG, "Thread started.");
+    }
+
+    private void setAvailability(final boolean enabled) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                view_temp.setEnabled(enabled);
+                set_next_time.setEnabled(enabled);
+                manage_member.setEnabled(enabled);
+                scan_bt.setEnabled(enabled);
+            }
+        });
     }
 
     public static boolean hasPermission(Context context) {

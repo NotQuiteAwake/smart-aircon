@@ -12,7 +12,7 @@
 
         <activity android:name=".MemberManagerActivity"></activity>
         <activity android:name=".ViewTempActivity"></activity>
-        <activity android:name=".EditExpActivity"></activity>
+        <activity android:name=".EditMemberActivity"></activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
