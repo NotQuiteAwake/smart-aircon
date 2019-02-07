@@ -14,9 +14,9 @@ Many functions are yet complete, but any advise would be welcomed.
 - [x] Implementation of Dialogs for interaction
 - [x] Implementation of auto-search for the server (test incomplete)
 - [x] Code encapsulation (Person, State, Networking)
-- [ ] Implementation of a Priority System for multiple users (server & app in progress)
+- [x] UI Rearrangement
+- [ ] Implementation of a Priority System for multiple users (server in progress)
 - [ ] Implementation of a Tag System to describe user status (server in progress)
 - [ ] Raspberry Pi migration for the data collection code
-- [ ] UI rearrangement
 - [ ] Implementation of Wifi/bluetooth scanning detection of present users
 - [ ] Java variable naming improvement

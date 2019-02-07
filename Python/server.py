@@ -98,20 +98,20 @@ def comp_task():
 		elif cmd == 'set_user_presence':
 			person_id = task['person_id']
 			presence = task['presence']
-			users[person_id].set_presence((presence > 0))
+			users[person_id].set_presence(presence)
 			return jsonify({'status': 1})
 
 		elif cmd == 'set_user_priority':
 			person_id = task['person_id']
 			priority = task['priority']
-			users[person_id].set_user_priority(priority)
+			users[person_id].set_priority(priority)
 			return jsonify({'status': 1})
 
 		# TODO: Implement findStateById to get the real state detail with state ID
 		elif cmd == 'set_user_state':
 			person_id = task['person_id']
 			state_id = task['state_id']
-			users[person_id].set_user_state(state_id)
+			users[person_id].set_state(state_id)
 			return jsonify({'status': 1})
 
 		elif cmd == 'add_state' or cmd == 'set_state':

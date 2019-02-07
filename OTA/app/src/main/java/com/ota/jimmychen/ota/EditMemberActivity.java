@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.renderscript.RenderScript;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +26,6 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +50,19 @@ public class EditMemberActivity extends Activity {
     private Button set_priority, set_state;
     private TextView priority_tv, name_tv, state_tv;
     private Switch presence_switch;
+
+    private class ChoiceOnClickListener implements DialogInterface.OnClickListener {
+        private int position = 0;
+
+        @Override
+        public void onClick(DialogInterface dialogInterface, int position) {
+            this.position = position;
+        }
+
+        public int getPosition() {
+            return this.position;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +186,7 @@ public class EditMemberActivity extends Activity {
             }
         });
 
+        // TODO: Fix bug where presence don't automatically change and "person_id":""
         presence_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, final boolean isChecked) {
@@ -187,16 +199,20 @@ public class EditMemberActivity extends Activity {
             }
         });
 
+        final ChoiceOnClickListener choiceOnClickListener = new ChoiceOnClickListener();
+
         set_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new AlertDialog.Builder(EditMemberActivity.this)
                         .setTitle("Set Your State")
                         .setIcon(android.R.drawable.sym_def_app_icon)
-                        .setSingleChoiceItems(state_list.toArray(new String[state_list.size()]), 0, new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(state_list.toArray(new String[state_list.size()]), 0, choiceOnClickListener)
+                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                state_id = state_list.get(i);
+                                int position = choiceOnClickListener.getPosition();
+                                state_id = state_list.get(position);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -211,7 +227,61 @@ public class EditMemberActivity extends Activity {
                                     }
                                 }).start();
                             }
-                        }).show();
+                        })
+                        .setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                final int position = choiceOnClickListener.getPosition();
+                                final String removed_id = state_list.remove(position);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        state_tv.setText("State: " + state_list.get(0));
+                                    }
+                                });
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        network.removeState(removed_id);
+                                    }
+                                }).start();
+                            }
+                        })
+                        .setNeutralButton("Add", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                final EditText et = new EditText(EditMemberActivity.this);
+                                new AlertDialog.Builder(EditMemberActivity.this)
+                                        .setView(et)
+                                        .setTitle("Set Param:")
+                                        .setIcon(android.R.drawable.sym_def_app_icon)
+                                        .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                final String new_id = "State#" + state_list.size();
+                                                state_list.add(new_id);
+                                                final int temp_diff = Integer.parseInt(et.getText().toString());
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        state_tv.setText("State: " + new_id);
+                                                    }
+                                                });
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        network.addState(new_id, temp_diff);
+                                                        network.setState(person_id, new_id);
+                                                    }
+                                                }).start();
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", null)
+                                        .show();
+                            }
+                        })
+                        .show();
             }
         });
 

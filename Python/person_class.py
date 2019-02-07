@@ -2,8 +2,8 @@ from state_class import State
 
 
 class Person:
-	def __init__(self, person_id = "", exp_temp = [x for x in range(24)], priority=0, state=State()):
-		self.mIsPresent = False
+	def __init__(self, person_id = "default", exp_temp = [x for x in range(24)], priority=0, state=State()):
+		self.mIsPresent = 0
 		self.mExpTemp = exp_temp
 		self.mPriority = priority
 		self.mPersonId = person_id
@@ -44,6 +44,6 @@ class Person:
 				"person_id": self.get_person_id(),
 				"exp_temp": self.get_exp_temp(),
 				"state_id": self.get_state().get_state_id(),
-				"presence": 1 if self.get_presence() else 0,
+				"presence": self.get_presence(),
 				"priority": self.get_priority()
 				}
