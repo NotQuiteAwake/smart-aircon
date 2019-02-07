@@ -2,6 +2,8 @@ package com.ota.jimmychen.ota;
 
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -230,6 +232,16 @@ public class Networking {
             res = strToDouble(jsonToArray(data.getJSONArray("temp")));
         } catch (JSONException e) { e.printStackTrace(); }
         return res;
+    }
+
+    public int getNextTime() {
+        int next_time = 0;
+        try {
+            JSONObject json = new JSONObject(getStatJson());
+            next_time = json.getInt("p_time");
+        }
+        catch (JSONException e) { e.printStackTrace(); }
+        return next_time;
     }
 
     public List<String> getMemberList() {

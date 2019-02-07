@@ -181,4 +181,4 @@ if __name__ == '__main__':
 	for i in range(24):
 		temp.append(i)
 
-	app.run(host='127.0.0.1', port=8080)
+	app.run(host='0.0.0.0', port=8080)
