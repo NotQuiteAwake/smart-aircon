@@ -294,6 +294,29 @@ public class Networking {
         } catch (JSONException e) { e.printStackTrace(); }
     }
 
+    public void removeState(String state_id) {
+        try {
+            JSONObject req = new JSONObject();
+            req.put("cmd", "remove_state");
+            req.put("state_id", state_id);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) { e.printStackTrace(); }
+    }
+
+    public void addState(String state_id, int temp_diff) {
+        try {
+            JSONObject req = new JSONObject();
+            req.put("cmd", "add_state");
+            req.put("state_id", state_id);
+            req.put("temp_diff", temp_diff);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+    }
+
     public void setState(String person_id, String state_id) {
         JSONObject req = new JSONObject();
         try {
