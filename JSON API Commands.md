@@ -75,7 +75,7 @@ The file lists all the API commands that are available through JSON.
 
     ```JAVA
     @return
-    *status    
+    *status
     *member_list
     ```
 
@@ -105,7 +105,7 @@ The file lists all the API commands that are available through JSON.
     ```JAVA
     @param
     *person_id
-    *presense
+    *presence
     ```
 
     ```JAVA
@@ -214,8 +214,26 @@ The file lists all the API commands that are available through JSON.
     @return
     *status
     ?person_id // void if status = -1
-    ?state_id // void if status = -1
+    ?state_id
     ?exp_temp
     ?priority
     ?presence
+    ```
+
+- *set_name*
+
+    ```JAVA
+    @param
+    *person_id
+    *name
+
+    @return
+    *status
+
+- *get_state_list*
+
+    ```JAVA
+    @return
+    *status
+    *state_list
     ```
