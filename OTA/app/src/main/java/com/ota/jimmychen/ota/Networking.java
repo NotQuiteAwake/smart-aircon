@@ -69,6 +69,7 @@ public class Networking {
     }
 
     private void postRequest(final String urlstr, final JSONObject json) {
+        Log.i(CLASS_TAG, "Connecting to " + urlstr);
         OkHttpClient httpClient = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
         final String urlStr = urlstr + ":" + PORT_NUMBER;

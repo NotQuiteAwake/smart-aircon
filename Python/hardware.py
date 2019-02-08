@@ -11,7 +11,9 @@ from lstm_class import keras_lstm
 
 manager = Manager()
 
-ser = serial.Serial('/dev/cu.usbmodem14101', 115200, timeout=1)
+# TODO: Predicted time is wrong
+
+ser = serial.Serial('/dev/cu.usbmodem141201', 115200, timeout=1)
 mutex = Lock()
 
 act_LSTM = keras_lstm(_name='act_lstm',_n_epochs=5000, _verbose=0)
@@ -160,7 +162,7 @@ def loop():
 
 		if s[2] == '.' or s[1] == '.':
 			print(relStamp.value % 24)
-# 			print("Predicted time diff: " + str(nxtDiff))
+ 			print("Predicted time diff: " + str(nxtDiff))
 			print("Actual Temperature: " + s)
 
 			if mutex.acquire():
