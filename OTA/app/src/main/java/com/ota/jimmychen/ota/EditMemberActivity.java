@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -41,7 +42,7 @@ public class EditMemberActivity extends Activity {
     private String ip_address = null, person_id = "default", state_id = "State", name = "Name";
     private List<Double> exp_list = new ArrayList<>();
     private Thread get_exp_thread = null;
-    private List<String> state_list = new ArrayList<>();
+    private List<String> mStateList = new ArrayList<>();
 
     private int priority, presence;
 
@@ -95,7 +96,7 @@ public class EditMemberActivity extends Activity {
                     //TODO: Check presence & state_id
                     presence = json.getInt("presence");
                     state_id = json.getString("state_id");
-                    state_list = network.getStateList();
+                    mStateList = network.getStateList();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -206,12 +207,12 @@ public class EditMemberActivity extends Activity {
                 new AlertDialog.Builder(EditMemberActivity.this)
                         .setTitle("Set Your State")
                         .setIcon(android.R.drawable.sym_def_app_icon)
-                        .setSingleChoiceItems(state_list.toArray(new String[state_list.size()]), 0, choiceOnClickListener)
+                        .setSingleChoiceItems(mStateList.toArray(new String[mStateList.size()]), 0, choiceOnClickListener)
                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 int position = choiceOnClickListener.getPosition();
-                                state_id = state_list.get(position);
+                                state_id = mStateList.get(position);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -231,11 +232,11 @@ public class EditMemberActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 final int position = choiceOnClickListener.getPosition();
-                                final String removed_id = state_list.remove(position);
+                                final String removed_id = mStateList.remove(position);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        state_tv.setText("State: " + state_list.get(0));
+                                        state_tv.setText("State: " + mStateList.get(0));
                                     }
                                 });
 
@@ -243,7 +244,7 @@ public class EditMemberActivity extends Activity {
                                     @Override
                                     public void run() {
                                         network.removeState(removed_id);
-                                        network.setState(person_id, state_list.get(0));
+                                        network.setState(person_id, mStateList.get(0));
                                     }
                                 }).start();
                             }
@@ -251,17 +252,19 @@ public class EditMemberActivity extends Activity {
                         .setNeutralButton("Add", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                final EditText et = new EditText(EditMemberActivity.this);
+                                final View addStateView = LayoutInflater.from(EditMemberActivity.this).inflate(R.layout.add_state, null);
                                 new AlertDialog.Builder(EditMemberActivity.this)
-                                        .setView(et)
+                                        .setView(addStateView)
                                         .setTitle("Set Param:")
                                         .setIcon(android.R.drawable.sym_def_app_icon)
                                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
-                                                final String new_id = "State#" + state_list.size();
-                                                state_list.add(new_id);
-                                                final int temp_diff = Integer.parseInt(et.getText().toString());
+                                                EditText state_id_et = addStateView.findViewById(R.id.state_id_et);
+                                                EditText temp_diff_et = addStateView.findViewById(R.id.temp_diff_et);
+                                                final String new_id = state_id_et.getText().toString();
+                                                mStateList.add(new_id);
+                                                final int temp_diff = Integer.parseInt(temp_diff_et.getText().toString());
                                                 runOnUiThread(new Runnable() {
                                                     @Override
                                                     public void run() {

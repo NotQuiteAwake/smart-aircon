@@ -232,13 +232,13 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 isInitialized = false;
                 setAvailability(false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conn_stat.setText("Connected. Waiting for initialization to finish.");
+                    }
+                });
                 while (!isInitialized) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            conn_stat.setText("Connected. Waiting for initialization to finish.");
-                        }
-                    });
                     updateInitState(ip_address);
                     if (Thread.currentThread().isInterrupted()) {
                         return;
