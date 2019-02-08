@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-# univariate lstm example
+
 from numpy import array
+import matplotlib
+matplotlib.use('TkAgg')
+
 import keras
 from keras.models import Sequential
 from keras.layers import LSTM
 from keras.layers import Dense
 import matplotlib.pyplot as plt
-import time
-import matplotlib
-matplotlib.use('TkAgg')
 
+from keras.models import load_model
 
 def round_int(num) :
     return int(num + 0.5)
@@ -60,10 +61,11 @@ class keras_lstm:
     n_steps = 3
     n_features = 1
     n_epochs = 5000
+    name = 'model'
     verbose = 0
 
     # model init
-    def __init__(self, _n_steps = 3, _n_features = 1, units = 128, _n_epochs = 5000, _verbose = 0) :    
+    def __init__(self, _n_steps=3, _n_features=1, units=128, _n_epochs=5000, _verbose=0, _name='model'):
         self.n_steps = _n_steps
         self.n_features = _n_features
         self.n_epochs = _n_epochs
@@ -73,6 +75,13 @@ class keras_lstm:
         self.model.add(Dense(1))
         self.model.compile(optimizer='adam', loss='mse')
         self.model.summary()
+        self.name = _name
+
+    def save_model(self):
+        self.model.save(self.name)
+
+    def load_model(self):
+        self.model = load_model(self.name)
 
     # split a univariate sequence into samples
     def split_sequence(self, sequence, n_steps):

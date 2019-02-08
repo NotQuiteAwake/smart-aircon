@@ -1,3 +1,6 @@
+# -*- coding:utf-8 -*-
+
+
 from flask import *
 from multiprocessing import Value, Lock, Manager
 from ctypes import c_char_p
@@ -20,7 +23,7 @@ cur_stamp = Value('i', 0)
 p_nxt_time = Value('i', 0)
 mutex = Lock()
 prime_user = Value(c_char_p, "default")
-state = manager.dict()
+states = manager.dict()
 
 
 @app.route('/')
@@ -55,13 +58,16 @@ def comp_task():
 		task = tasks[-1]
 		tasks.pop(-1)
 		cmd = task['cmd']
+		ret = jsonify({'status': 1})
 		if cmd == 'check_init_state':
-			return jsonify({'status': 1, 'init_state': init_state.value})
+			ret = jsonify({'status': 1, 'init_state': init_state.value})
 
 		elif cmd == 'get_stat':
 			temp_list = [x for x in temp]
-			exp_list = users[prime_user.value].get_exp_temp()
-			return jsonify({'status': 1, 'temp': temp_list, 'exp_temp': exp_list, 'time': cur_stamp.value % 24, 'p_time': p_nxt_time.value})
+			exp_list = users[prime_user['value']].get_exp_temp()
+			ret =  jsonify({'status': 1, 'temp': temp_list,
+							'exp_temp': exp_list, 'time': cur_stamp.value % 24,
+							'p_time': p_nxt_time.value, 'isOn': turnedOn.value})
 
 		elif cmd == 'set_exp_temp':
 			person_id = task['person_id']
@@ -69,60 +75,70 @@ def comp_task():
 			exp_temp = task['exp_temp']
 			if person_id in member_list:
 				if mutex.acquire():
-					users[person_id].set_exp_temp(exp_time, exp_temp)
+					person = users[person_id]
+					person.set_exp_temp(exp_time, exp_temp)
+					users[person_id] = person
 				mutex.release()
-				return jsonify({'status': 1})
+				ret =  jsonify({'status': 1})
 			else:
-				return jsonify({'status': -1})
+				ret = jsonify({'status': -1})
 
 		elif cmd == 'set_exp_time':
 			if mutex.acquire():
 				nxt_time.value = task['exp_time']
 			mutex.release()
-			return jsonify({'status': 1})
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'get_member_list':
-			return jsonify({'status': 1, 'member_list': users.keys()})
+			ret = jsonify({'status': 1, 'member_list': users.keys()})
 
 		elif cmd == 'get_exp_temp':
 			app.logger.info(task)
 			person_id = task['person_id']
 			if person_id in users:
-				return jsonify({'status': 1, 'exp_temp': users[person_id].get_exp_temp()})
+				ret = jsonify({'status': 1, 'exp_temp': users[person_id].get_exp_temp()})
 			else:
-				return jsonify({'status': -1, 'exp_temp': users['default'].get_exp_temp()})
+				ret = jsonify({'status': -1, 'exp_temp': users['default'].get_exp_temp()})
 
 		elif cmd == 'get_prime_user':
-			return jsonify({'status': 1, 'prime_user': prime_user.value})
+			ret = jsonify({'status': 1, 'prime_user': prime_user['value']})
 
 		elif cmd == 'set_user_presence':
 			person_id = task['person_id']
 			presence = task['presence']
-			users[person_id].set_presence(presence)
-			return jsonify({'status': 1})
+			person = users[person_id]
+			person.set_presence(presence)
+			users[person_id] = person
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'set_user_priority':
 			person_id = task['person_id']
 			priority = task['priority']
-			users[person_id].set_priority(priority)
-			return jsonify({'status': 1})
+			person = users[person_id]
+			person.set_priority(priority)
+			users[person_id] = person
+			ret = jsonify({'status': 1})
 
 		# TODO: Implement findStateById to get the real state detail with state ID
 		elif cmd == 'set_user_state':
 			person_id = task['person_id']
 			state_id = task['state_id']
-			users[person_id].set_state(state_id)
-			return jsonify({'status': 1})
+
+			person = users[person_id]
+			person.set_state(states[state_id])
+			users[person_id] = person
+
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'add_state' or cmd == 'set_state':
 			state_id = task['state_id']
 			temp_diff = task['temp_diff']
-			state[state_id] = State(state_id, temp_diff)
-			return jsonify({'status': 1})
+			states[state_id] = State(state_id, temp_diff)
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'remove_state':
-			del state[task['state_id']]
-			return jsonify({'status': 1})
+			del states[task['state_id']]
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'add_user':
 			person_id = task['person_id']
@@ -131,48 +147,98 @@ def comp_task():
 			state_id = task['state_id']
 			# TODO: add findStateById
 			users[person_id] = Person(person_id, exp_temp, priority, state_id)
-			return jsonify({'status': 1})
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'remove_user':
 			person_id = task['person_id']
 			del users[person_id]
-			return jsonify({'status': 1})
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'get_user':
 			person_id = task['person_id']
 			if person_id in users.keys():
 				# TODO: check get_presence value correctness
-				return jsonify(users[person_id].to_dict())
+				ret =  jsonify(users[person_id].to_dict())
 			else:
-				return jsonify({'status': -1})
+				ret = jsonify({'status': -1})
 
 		elif cmd == 'set_name':
 			person_id = task['person_id']
 			name = task['name']
 			users[name] = users[person_id]
 			del users[person_id]
-			return jsonify({'status': 1})
+			ret = jsonify({'status': 1})
 
 		elif cmd == 'get_state_list':
-			return jsonify({'status': 1, 'state_list': states.keys()})
+			ret = jsonify({'status': 1, 'state_list': states.keys()})
 
 		else:
-			return jsonify({'status': -1})
+			ret = jsonify({'status': -1})
+
+		update_priority()
+		return ret
+
+
+def update_priority():
+	#implement isOn
+	global users, temp, states, prime_user, keep, forced_swing, turnedOn
+	pre_prio = {'person_id': 'null', 'priority': -100}
+	npr_prio = {'person_id': 'null', 'priority': -100}
+
+	for key in users.keys():
+		person = users[key]
+		prec = person.get_presence()
+		prio = person.get_priority()
+		p_id = person.get_person_id()
+
+		if npr_prio['priority'] < prio:
+			npr_prio['person_id'] = p_id
+			npr_prio['priority'] = prio
+
+		if prec == 1 and pre_prio['priority'] < prio:
+			pre_prio['person_id'] = p_id
+			pre_prio['priority'] = prio
+
+	mutex.acquire()
+	if pre_prio['person_id'] == 'null':
+		keep.value = 1
+		prime_user['value'] = npr_prio['person_id']
+
+	else:
+		keep.value = 0
+		prime_user['value'] = pre_prio['person_id']
+
+	person = users[prime_user['value']]
+
+	if turnedOn.value == 1 and person.is_on_time():
+		forced_swing.value = 1
+	else:
+		forced_swing.value = 0
+	mutex.release()
+
+# THE PRIORITY SYSTEM:
+# FIRST PRIORITY: USERS AT HOME
+# SECOND PRIORITY: USERS WITH HIGHER PRIORITY VALUE
+
+# 	on_start_state = users[prime_user].get_state()
+# 	exp_list = users[prime_user].get_exp_temp()
 
 
 # TODO: add mutex lock
-# TODO: add default state
-# TODO: add state_dict into the param as a manager.dict()
 # TODO: add precautions for state nonexistent
-# TODO: add individual thread for updating the params instead of in the hardware.py
 
 
-def run(init_state_v, nxt_time_v, exp_dict, temp_arr, p_nxt_time_v, cur_stamp_v, prime_user_s, state_dict):
+def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v,
+		cur_stamp_v, prime_user_s, state_dict, turnedOn_v, keep_v, forced_swing_v):
 	log.setLevel(logging.ERROR)
-	# TODO: synchronize prime_user as a Value with type String (person_id)
-	# TODO: write a custom Manager class
-	global users, temp, nxt_time, init_state, p_nxt_time, cur_stamp, prime_user, states
-	users = exp_dict
+	global users, temp, nxt_time, init_state, p_nxt_time, \
+		cur_stamp, prime_user, states, turnedOn, forced_swing, keep
+
+	turnedOn = turnedOn_v
+	keep = keep_v
+	forced_swing = forced_swing_v
+
+	users = users_dict
 	temp = temp_arr
 	nxt_time = nxt_time_v
 	init_state = init_state_v
@@ -184,14 +250,19 @@ def run(init_state_v, nxt_time_v, exp_dict, temp_arr, p_nxt_time_v, cur_stamp_v,
 
 
 if __name__ == '__main__':
-	global users, temp, states
+	global users, temp, states, turnedOn, forced_swing, keep
 	print("Running in DEMO mode.")
 	init_state.value = 1
+
 	states = manager.dict()
 	users = manager.dict()
-	# TODO: add state default for normal mode
 	users['default'] = Person()
 	states['default'] = State()
+
+	forced_swing = Value('i', 0)
+	turnedOn = Value('i', 1)
+	keep = Value('i', 0)
+
 	for i in range(24):
 		temp.append(i)
 
