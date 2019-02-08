@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         scan_bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                conn_stat.setText("Scanning for address");
                 scan();
             }
         });
@@ -113,7 +112,9 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 // TODO: There are usages of ip_address that didn't come with http://
-                                ip_address = "http://" + et.getText().toString();
+                                if (ip_address.indexOf("http://") == -1) {
+                                    ip_address = "http://" + et.getText().toString();
+                                }
                                 dataProc(ip_address);
                             }
                         })
@@ -188,6 +189,13 @@ public class MainActivity extends AppCompatActivity {
     public void scan() {
         if (scanner_thread != null) return;
 
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                conn_stat.setText("Scanning for address");
+            }
+        });
+
         scanner_thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -197,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 if (data_proc_thread != null) return;
                 if (ip != null) ip_address = "http://" + ip;
                 Log.i(ACTIVITY_TAG, "Scan complete. Address is " + ip_address);
+                //TODO: cannot identify connection failure
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -222,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 isInitialized = false;
+                setAvailability(false);
                 while (!isInitialized) {
                     runOnUiThread(new Runnable() {
                         @Override

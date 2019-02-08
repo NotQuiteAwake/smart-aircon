@@ -243,6 +243,7 @@ public class EditMemberActivity extends Activity {
                                     @Override
                                     public void run() {
                                         network.removeState(removed_id);
+                                        network.setState(person_id, state_list.get(0));
                                     }
                                 }).start();
                             }
