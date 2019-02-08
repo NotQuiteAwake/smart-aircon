@@ -22,7 +22,7 @@ init_state = Value('i', 0)
 cur_stamp = Value('i', 0)
 p_nxt_time = Value('i', 0)
 mutex = Lock()
-prime_user = Value(c_char_p, "default")
+prime_user = manager.dict()
 states = manager.dict()
 
 
@@ -142,11 +142,11 @@ def comp_task():
 
 		elif cmd == 'add_user':
 			person_id = task['person_id']
-			priority = task['priority']
-			exp_temp = task['exp_temp']
-			state_id = task['state_id']
-			# TODO: add findStateById
-			users[person_id] = Person(person_id, exp_temp, priority, state_id)
+#			priority = task['priority']
+#			exp_temp = task['exp_temp']
+#			state_id = task['state_id']
+			person = Person(person_id=person_id)
+			users[person_id] = person
 			ret = jsonify({'status': 1})
 
 		elif cmd == 'remove_user':
@@ -158,14 +158,16 @@ def comp_task():
 			person_id = task['person_id']
 			if person_id in users.keys():
 				# TODO: check get_presence value correctness
-				ret =  jsonify(users[person_id].to_dict())
+				ret = jsonify(users[person_id].to_dict())
 			else:
 				ret = jsonify({'status': -1})
 
 		elif cmd == 'set_name':
 			person_id = task['person_id']
 			name = task['name']
-			users[name] = users[person_id]
+			person = users[person_id]
+			person.set_person_id(name)
+			users[name] = person
 			del users[person_id]
 			ret = jsonify({'status': 1})
 

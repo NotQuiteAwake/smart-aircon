@@ -78,4 +78,8 @@ public class listAdapter extends RecyclerView.Adapter<listAdapter.ListViewHolder
         notifyItemRemoved(position);
         notifyDataSetChanged();
     }
+
+    public int getDataSize() {
+        return mDataset.size();
+    }
 }

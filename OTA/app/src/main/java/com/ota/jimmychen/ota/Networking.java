@@ -351,6 +351,28 @@ public class Networking {
         return list;
     }
 
+    public void removeUser(String person_id) {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "remove_user");
+            req.put("person_id", person_id);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addUser(String person_id) {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "add_user");
+            req.put("person_id", person_id);
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e){ e.printStackTrace(); }
+    }
+
     private List<String> jsonToArray(JSONArray jArray) {
         List<String> list = new ArrayList<String>();
         if (jArray != null) {
