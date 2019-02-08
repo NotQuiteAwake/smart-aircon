@@ -199,11 +199,10 @@ public class EditMemberActivity extends Activity {
             }
         });
 
-        final ChoiceOnClickListener choiceOnClickListener = new ChoiceOnClickListener();
-
         set_state.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final ChoiceOnClickListener choiceOnClickListener = new ChoiceOnClickListener();
                 new AlertDialog.Builder(EditMemberActivity.this)
                         .setTitle("Set Your State")
                         .setIcon(android.R.drawable.sym_def_app_icon)
