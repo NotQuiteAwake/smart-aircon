@@ -34,13 +34,13 @@ import java.util.List;
 // Implement person_id: retrieve info from Intent
 public class EditMemberActivity extends Activity {
     private static final int PORT_NUMBER = 8080;
-    private BarChart expChart = null;
-    private BarData expData = null;
+    private BarChart mExpChart = null;
+    private BarData mExpData = null;
     private ArrayList<BarEntry> yValues = new ArrayList<>();
 
     private Networking network = new Networking(PORT_NUMBER);
     private String ip_address = null, person_id = "default", state_id = "State", name = "Name";
-    private List<Double> exp_list = new ArrayList<>();
+    private List<Double> mExpList = new ArrayList<>();
     private Thread get_exp_thread = null;
     private List<String> mStateList = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public class EditMemberActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editmember);
 
-        expChart = (BarChart)findViewById(R.id.bar_chart);
+        mExpChart = (BarChart)findViewById(R.id.bar_chart);
         set_priority = (Button) findViewById(R.id.set_priority_bt);
         set_state = (Button) findViewById(R.id.set_state_bt);
         priority_tv = (TextView) findViewById(R.id.priority);
@@ -111,7 +111,7 @@ public class EditMemberActivity extends Activity {
                 }
 
                 getTemp(person_id);
-                initData((ArrayList<Double>) exp_list);
+                initData((ArrayList<Double>) mExpList);
                 initBarChart();
             }
             //TODO: add a name for each Thread
@@ -296,7 +296,7 @@ public class EditMemberActivity extends Activity {
         get_exp_thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                exp_list = network.getExpTemp(person_id);
+                mExpList = network.getExpTemp(person_id);
             }
         });
         get_exp_thread.run();
@@ -312,26 +312,28 @@ public class EditMemberActivity extends Activity {
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Expected Temperature");
         barDataSet.setColor(TEAL_COLOR);
-        expData = new BarData(barDataSet);
+        barDataSet.setDrawValues(false);
+        mExpData = new BarData(barDataSet);
         float barWidth = 0.45f;
-        expData.setBarWidth(barWidth);
+        mExpData.setBarWidth(barWidth);
     }
 
     private void initBarChart() {
-        if (exp_list.size() == 0) return;
-        expChart.setData(expData);
-        expChart.setScaleEnabled(true);
+        if (mExpList.size() == 0) return;
+        mExpChart.setData(mExpData);
+        mExpChart.setScaleEnabled(true);
 
+        mExpChart.getDescription().setEnabled(false);
         //XAxis Settings
-        XAxis xAxis = expChart.getXAxis();
+        XAxis xAxis = mExpChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setLabelRotationAngle(10f);
         xAxis.setAxisMinimum(0f);
-        YAxis RAxis = expChart.getAxisRight();
+        YAxis RAxis = mExpChart.getAxisRight();
         RAxis.setEnabled(false);
 
-        YAxis LAxis = expChart.getAxisLeft();
+        YAxis LAxis = mExpChart.getAxisLeft();
         RAxis.setDrawAxisLine(false);
         LAxis.setDrawAxisLine(false);
         LAxis.setDrawAxisLine(false);
@@ -339,18 +341,18 @@ public class EditMemberActivity extends Activity {
         LAxis.setAxisMinimum(10f);
         LAxis.setAxisMaximum(30f);
 
-        expChart.setScaleEnabled(false);
-        expChart.setScaleXEnabled(true);
-        expChart.setScaleYEnabled(false);
-        expChart.setDoubleTapToZoomEnabled(false);
+        mExpChart.setScaleEnabled(false);
+        mExpChart.setScaleXEnabled(true);
+        mExpChart.setScaleYEnabled(false);
+        mExpChart.setDoubleTapToZoomEnabled(false);
 
-        expChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+        mExpChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
                 final int index = (int)e.getX();
-                Log.i("expChart.OnChartValueSelected", "index = " + index);
+                Log.i("mExpChart.OnChartValueSelected", "index = " + index);
                 final EditText et = new EditText(EditMemberActivity.this);
-                et.setText(String.valueOf(exp_list.get(index)));
+                et.setText(String.valueOf(mExpList.get(index)));
                 new AlertDialog.Builder(EditMemberActivity.this)
                         .setTitle("Modify Expected Temperature:")
                         .setIcon(android.R.drawable.sym_def_app_icon)
@@ -359,7 +361,7 @@ public class EditMemberActivity extends Activity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 final double exp_temp = Double.valueOf(et.getText().toString());
-                                exp_list.set(index, exp_temp);
+                                mExpList.set(index, exp_temp);
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -368,8 +370,8 @@ public class EditMemberActivity extends Activity {
                                     }
                                 }).start();
                                 yValues.set(index, new BarEntry(index, double_to_float(exp_temp)));
-                                expChart.notifyDataSetChanged();
-                                expChart.invalidate();
+                                mExpChart.notifyDataSetChanged();
+                                mExpChart.invalidate();
                             }
                         })
                         .setNegativeButton("Cancel", null).show();
@@ -378,7 +380,7 @@ public class EditMemberActivity extends Activity {
             @Override
             public void onNothingSelected() { }
         });
-        expChart.notifyDataSetChanged();
-        expChart.invalidate();
+        mExpChart.notifyDataSetChanged();
+        mExpChart.invalidate();
     }
 }

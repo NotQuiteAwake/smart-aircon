@@ -23,6 +23,7 @@ cur_stamp = Value('i', 0)
 p_nxt_time = Value('i', 0)
 mutex = Lock()
 prime_user = manager.dict()
+prime_user['value'] = 'default'
 states = manager.dict()
 
 
@@ -174,6 +175,13 @@ def comp_task():
 		elif cmd == 'get_state_list':
 			ret = jsonify({'status': 1, 'state_list': states.keys()})
 
+		elif cmd == 'set_state_off':
+			if mutex.acquire():
+				turnedOff.value = 1
+				turnedOn.value = 0
+			mutex.release()
+			ret = jsonify({'status': 1})
+
 		else:
 			ret = jsonify({'status': -1})
 
@@ -230,13 +238,14 @@ def update_priority():
 # TODO: add precautions for state nonexistent
 
 
-def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v,
-		cur_stamp_v, prime_user_s, state_dict, turnedOn_v, keep_v, forced_swing_v):
+def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v, cur_stamp_v,
+		prime_user_s, state_dict, turnedOn_v, keep_v, forced_swing_v, turnedOff_v):
 	log.setLevel(logging.ERROR)
-	global users, temp, nxt_time, init_state, p_nxt_time, \
-		cur_stamp, prime_user, states, turnedOn, forced_swing, keep
+	global users, temp, nxt_time, init_state, p_nxt_time, cur_stamp, \
+		prime_user, states, turnedOn, forced_swing, keep, turnedOff
 
 	turnedOn = turnedOn_v
+	turnedOff = turnedOff_v
 	keep = keep_v
 	forced_swing = forced_swing_v
 
@@ -252,7 +261,7 @@ def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v,
 
 
 if __name__ == '__main__':
-	global users, temp, states, turnedOn, forced_swing, keep
+	global users, temp, states, turnedOn, forced_swing, keep, prime_user
 	print("Running in DEMO mode.")
 	init_state.value = 1
 
@@ -263,7 +272,10 @@ if __name__ == '__main__':
 
 	forced_swing = Value('i', 0)
 	turnedOn = Value('i', 1)
+	turnedOff = Value('i', 0)
 	keep = Value('i', 0)
+
+	prime_user['value'] = 'default'
 
 	for i in range(24):
 		temp.append(i)

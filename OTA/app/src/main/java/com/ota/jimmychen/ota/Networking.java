@@ -113,7 +113,7 @@ public class Networking {
         JSONObject req = new JSONObject();
 
         try {
-            req.put("cmd", "setExpTime");
+            req.put("cmd", "set_exp_time");
             req.put("exp_time", exp_time);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -371,6 +371,15 @@ public class Networking {
             postRequest(IP_ADDRESS, req);
             String result = getData(IP_ADDRESS);
         } catch (JSONException e){ e.printStackTrace(); }
+    }
+
+    public void setStateOff() {
+        JSONObject req = new JSONObject();
+        try {
+            req.put("cmd", "set_state_off");
+            postRequest(IP_ADDRESS, req);
+            String result = getData(IP_ADDRESS);
+        } catch (JSONException e) { e.printStackTrace(); }
     }
 
     private List<String> jsonToArray(JSONArray jArray) {

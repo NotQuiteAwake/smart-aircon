@@ -13,7 +13,7 @@ manager = Manager()
 
 # TODO: Predicted time is wrong
 
-ser = serial.Serial('/dev/cu.usbmodem141201', 115200, timeout=1)
+ser = serial.Serial('/dev/cu.usbmodem14201', 115200, timeout=1)
 mutex = Lock()
 
 act_LSTM = keras_lstm(_name='act_lstm',_n_epochs=5000, _verbose=0)
@@ -115,7 +115,7 @@ def init():
 
 	p_nxt = 0
 	turnedOn.value = 0
-	turnedOff = True
+	turnedOff.value = True
 	ser.write('3#')
 	s = flt_read()
 
@@ -132,11 +132,11 @@ def loop():
 		s = flt_read()
 		if s == "FD08F7":
 			print("Conditioner turned off by user.")
-			turnedOff = True
+			turnedOff.value = 1
 			turnedOn.value = 0
 		elif s == "FD8877":
 			print("Conditioner turned on by user.")
-			turnedOff = False
+			turnedOff.value = 0
 			turnedOn.value = 1
 		cur = int(time.time())
 
@@ -185,7 +185,7 @@ def loop():
 			mutex.release()
 			print("Target Temperature: " + str(exp_temp))
 			if turnedOn.value == 1:
-				turnedOff = False
+				turnedOff.value = 0
 
 				if exp_temp > p_nxt:
 					ser.write("2#")
@@ -194,7 +194,7 @@ def loop():
 					ser.write("1#")
 # 					print("turning on cooling...")
 			else:
-				if not turnedOff:
+				if not turnedOff.value == 1:
 					ser.write("3#")
 				else: 
 					ser.write("4#")
@@ -202,10 +202,10 @@ def loop():
 	ser.close()
 
 
-def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v,
-		p_nxt_time_v, cur_time, prime_user_s, turnedOn_v, keep_v, forced_swing_v, load_models_v):
+def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v, p_nxt_time_v, cur_time,
+		prime_user_s, turnedOn_v, keep_v, forced_swing_v, load_models_v, turnedOff_v):
 	global init_state, nxt_time, users, tempRec, record_flag, p_nxt_time, \
-		relStamp, prime_user, turnedOn, keep, forced_swing, load_models
+		relStamp, prime_user, turnedOn, keep, forced_swing, load_models, turnedOff
 	init_state = init_state_v
 	nxt_time = nxt_time_v
 	users = users_dict
@@ -215,6 +215,7 @@ def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v,
 	relStamp = cur_time
 	prime_user = prime_user_s
 	turnedOn = turnedOn_v
+	turnedOff = turnedOff_v
 	keep = keep_v
 	forced_swing = forced_swing_v
 	load_models = load_models_v
@@ -226,8 +227,26 @@ def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v,
 
 
 if __name__ == '__main__':
-	tempRec = manager.list()
-	users = manager.dict()
-	init_state = Value('i', 0)
+	print("Running in DEMO Mode")
+	init_state = Value('i', 1)
 	nxt_time = Value('i', 0)
-	run(init_state, nxt_time, users, tempRec)
+	users = manager.dict()
+	person = Person()
+	person.set_presence(1)
+	users['default'] = person
+
+	tempRec = manager.list()
+	record_flag = (raw_input("record?") == 'y')
+	p_nxt_time = Value('i', 0)
+	relStamp = Value('i', 0)
+	prime_user = manager.dict()
+	prime_user['value'] = 'default'
+
+	turnedOn = Value('i', 0)
+	turnedOff = Value('i', 1)
+	keep = Value('i', 0)
+	forced_swing = Value('i', 0)
+	load_models = (raw_input('load models?') == 'y')
+	run(init_state, nxt_time, users, tempRec, record_flag, p_nxt_time,
+		relStamp, prime_user, turnedOn, keep, forced_swing,
+		load_models, turnedOff)
