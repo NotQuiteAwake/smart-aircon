@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean active_before_restore = false;
 
     private TextView conn_stat, time_stat;
-    private Button set_ip, set_next_time, view_temp, manage_member, scan_bt;
+    private Button set_ip, set_next_time, view_temp, manage_member, scan_bt, turn_off_bt;
 
     private Networking network = new Networking(PORT_NUMBER);
 
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         conn_stat = (TextView)findViewById(R.id.connectivity_tv);
         time_stat = (TextView)findViewById(R.id.next_time_tv);
 
+        turn_off_bt = (Button) findViewById(R.id.turn_off_bt);
         set_ip = (Button)findViewById(R.id.set_ip);
         set_next_time = (Button)findViewById(R.id.manual_set);
         view_temp = (Button)findViewById(R.id.view_temp);
@@ -80,6 +81,18 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions(new String[]{Manifest.permission.INTERNET}, 0);
 
         setAvailability(false);
+
+        turn_off_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        network.setStateOff();
+                    }
+                }).start();
+            }
+        });
 
         scan_bt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void scan() {
-        if (scanner_thread != null) return;
+        if (scanner_thread != null && scanner_thread.isAlive()) return;
 
         runOnUiThread(new Runnable() {
             @Override
@@ -289,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
                 view_temp.setEnabled(enabled);
                 set_next_time.setEnabled(enabled);
                 manage_member.setEnabled(enabled);
+                turn_off_bt.setEnabled(enabled);
             }
         });
     }

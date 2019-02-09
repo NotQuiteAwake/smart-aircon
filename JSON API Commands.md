@@ -237,3 +237,10 @@ The file lists all the API commands that are available through JSON.
     *status
     *state_list
     ```
+
+- *set_state_off*
+
+    ```JAVA
+    @return
+    *status
+    ```

@@ -68,6 +68,7 @@ public class ViewTempActivity extends AppCompatActivity {
         }
         BarDataSet barDataSet = new BarDataSet(yValues, "Temperature Record");
         barDataSet.setColor(TEAL_COLOR);
+        barDataSet.setDrawValues(false);
         mTempData = new BarData(barDataSet);
     }
 
@@ -77,6 +78,7 @@ public class ViewTempActivity extends AppCompatActivity {
         mTempData.setBarWidth(barWidth);
         mTempChart.setData(mTempData);
         mTempChart.setScaleEnabled(true);
+        mTempChart.getDescription().setEnabled(false);
 
         XAxis xAxis = mTempChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
