@@ -125,7 +125,8 @@ def init():
 
 
 def loop():
-	global tempRec, timedt, users, lastt, lstStamp, p_nxt, turnedOn, turnedOff, stStamp, nxtDiff, nxt_time, p_nxt_time
+	global tempRec, timedt, users, lastt, lstStamp, p_nxt, turnedOn, turnedOff, stStamp, \
+		nxtDiff, nxt_time, p_nxt_time, weighed_mean
 	global turnedOn
 
 	while True:
@@ -172,8 +173,26 @@ def loop():
 			mutex.release()
 			print("Predicted Temperature: " + str(p_nxt))
 			mutex.acquire()
-			exp_list = users[prime_user['value']].get_exp_temp()
-			exp_temp = exp_list[(relStamp.value + 1) % 24]
+
+			# Calculate exp_temp with weighed mean method
+			exp_temp = 0
+			prio_frac = 0
+
+			if weighed_mean:
+				for key in users.keys():
+					person = users[key]
+					prio_frac += person.get_priority()
+				for key in users.keys():
+					person = users[key]
+					prio = person.get_priority()
+					exp = person.get_exp_temp()[(relStamp.value + 1) % 24]
+					exp_temp += (prio/prio_frac) * exp
+
+			else:
+				# Fetch the exp of the big bro
+				exp_list = users[prime_user['value']].get_exp_temp()
+				exp_temp = exp_list[(relStamp.value + 1) % 24]
+
 			state = users[prime_user['value']].get_state()
 
 			if keep.value == 1:
@@ -203,9 +222,9 @@ def loop():
 
 
 def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v, p_nxt_time_v, cur_time,
-		prime_user_s, turnedOn_v, keep_v, forced_swing_v, load_models_v, turnedOff_v):
+		prime_user_s, turnedOn_v, keep_v, forced_swing_v, load_models_v, turnedOff_v, weighed_mean_v):
 	global init_state, nxt_time, users, tempRec, record_flag, p_nxt_time, \
-		relStamp, prime_user, turnedOn, keep, forced_swing, load_models, turnedOff
+		relStamp, prime_user, turnedOn, keep, forced_swing, load_models, turnedOff, weighed_mean
 	init_state = init_state_v
 	nxt_time = nxt_time_v
 	users = users_dict
@@ -219,6 +238,7 @@ def run(init_state_v, nxt_time_v, users_dict, temp_arr, record_flag_v, p_nxt_tim
 	keep = keep_v
 	forced_swing = forced_swing_v
 	load_models = load_models_v
+	weighed_mean = weighed_mean_v
 
 	init()
 	loop()
@@ -235,6 +255,8 @@ if __name__ == '__main__':
 	person.set_presence(1)
 	users['default'] = person
 
+	weighed_mean = 0
+
 	tempRec = manager.list()
 	record_flag = (raw_input("record?") == 'y')
 	p_nxt_time = Value('i', 0)
@@ -249,4 +271,4 @@ if __name__ == '__main__':
 	load_models = (raw_input('load models?') == 'y')
 	run(init_state, nxt_time, users, tempRec, record_flag, p_nxt_time,
 		relStamp, prime_user, turnedOn, keep, forced_swing,
-		load_models, turnedOff)
+		load_models, turnedOff, weighed_mean)

@@ -191,7 +191,7 @@ def comp_task():
 
 def update_priority():
 	#implement isOn
-	global users, temp, states, prime_user, keep, forced_swing, turnedOn
+	global users, temp, states, prime_user, keep, forced_swing, turnedOn, weighed_mean
 	pre_prio = {'person_id': 'null', 'priority': -100}
 	npr_prio = {'person_id': 'null', 'priority': -100}
 
@@ -239,10 +239,10 @@ def update_priority():
 
 
 def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v, cur_stamp_v,
-		prime_user_s, state_dict, turnedOn_v, keep_v, forced_swing_v, turnedOff_v):
+		prime_user_s, state_dict, turnedOn_v, keep_v, forced_swing_v, turnedOff_v, weighed_mean_v):
 	log.setLevel(logging.ERROR)
 	global users, temp, nxt_time, init_state, p_nxt_time, cur_stamp, \
-		prime_user, states, turnedOn, forced_swing, keep, turnedOff
+		prime_user, states, turnedOn, forced_swing, keep, turnedOff, weighed_mean
 
 	turnedOn = turnedOn_v
 	turnedOff = turnedOff_v
@@ -257,14 +257,15 @@ def run(init_state_v, nxt_time_v, users_dict, temp_arr, p_nxt_time_v, cur_stamp_
 	cur_stamp = cur_stamp_v
 	prime_user = prime_user_s
 	states = state_dict
+	weighed_mean = weighed_mean_v
 	app.run(host='0.0.0.0', port=8080)
 
-
 if __name__ == '__main__':
-	global users, temp, states, turnedOn, forced_swing, keep, prime_user
+	global users, temp, states, turnedOn, forced_swing, keep, prime_user, weighed_mean
 	print("Running in DEMO mode.")
 	init_state.value = 1
 
+	weighed_mean = 0
 	states = manager.dict()
 	users = manager.dict()
 	users['default'] = Person()
