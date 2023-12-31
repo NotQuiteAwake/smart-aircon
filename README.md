@@ -1,22 +1,17 @@
-# smart-air-conditioner
+# smart-aircon
 
-## Introduction
+A project I worked on long ago. If I remember correctly, the gist of the project
+was to use an Arduino + Raspberry Pi combo to imitate an air conditioner that
+could be remotely controlled from a phone on the local network, with some auto-on/off stuff using a LSTM model.
 
-NB: The project is created for competition purposes.
+An LED on the Arduino will indicate the ON/OFF status of the "air conditioner";
+It would be able to actually control an air conditioner if the correct IR
+signals have been programmed in (iirc). The Raspberry Pi listens to the phone,
+and when the user switches the AC off, it will send a signal to the Arduino to
+do so.
 
-The aim of the project is to build a smart system for air conditioners using a laptop and an arduino device.
+But there is a twist: The Raspberry Pi also ran an LSTM model which recorded the
+user behaviour (creepy!) and which predicts when the user will want the AC on
+again, switching the AC on automatically at that predicted time.
 
-Many functions are yet complete, but any advise would be welcomed.
-
-## Todo-list
-
-- [x] Implementation of Temperature Visualisation
-- [x] Implementation of Dialogs for interaction
-- [x] Implementation of auto-search for the server
-- [x] Code encapsulation (Person, State, Networking)
-- [x] UI Rearrangement
-- [x] Implementation of a Priority System for multiple users (test incomplete)
-- [x] Implementation of a Tag System to describe user status (test incomplete)
-- [ ] Raspberry Pi migration for the data collection code
-- [ ] Implementation of Wifi/bluetooth scanning detection of present users
-- [ ] Java variable naming improvement
+The code is released under an MIT license.
